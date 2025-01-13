@@ -1,0 +1,16 @@
+services:
+  mysql:
+    image: mysql:8.0.22
+    container_name: ecommerce-mysql8
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: songhee1
+      MYSQL_DATABASE: Smarket
+      MYSQL_USER: ecommerce
+      MYSQL_PASSWORD: aa
+      TZ: Asia/Seoul
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./db/mysql/data:/var/lib/mysql
+      - ./db/mysql/conf.d:/etc/mysql/conf.d
