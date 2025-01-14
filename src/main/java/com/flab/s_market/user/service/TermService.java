@@ -2,6 +2,7 @@ package com.flab.s_market.user.service;
 
 import com.flab.s_market.user.domain.Term;
 import com.flab.s_market.user.dto.AllTermDTO;
+import com.flab.s_market.user.dto.DetailTermDTO;
 import com.flab.s_market.user.dto.TermDTO;
 import com.flab.s_market.user.dto.TermsDTO;
 import com.flab.s_market.user.repository.TermRepository;
@@ -46,6 +47,16 @@ public class TermService {
         return AllTermDTO.builder()
             .main(mainTermDTO)
             .additional(additionalTermDTO)
+            .build();
+    }
+
+    public DetailTermDTO getDetailTerms() {
+        List<Term> terms = termRepository.findByDetailAndVersion(true, 1.1);
+        Term detailTerm = terms.get(0);
+        return DetailTermDTO.builder()
+            .url(detailTerm.getUrl())
+            .version(detailTerm.getVersion())
+            .title(detailTerm.getTitle())
             .build();
     }
 }
