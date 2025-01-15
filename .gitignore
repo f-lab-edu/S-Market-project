@@ -40,4 +40,4 @@ out/
 .env*
 
 ### png file ###
-*.png
+/src/main/resources/static/*.png

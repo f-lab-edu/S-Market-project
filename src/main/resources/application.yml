@@ -19,7 +19,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
-    database-platform: org.hibernate.dialect.MySQL8Dialect
+    database-platform: org.hibernate.dialect.MySQLDialect
     show-sql: true
 
   mail:
@@ -27,6 +27,7 @@ spring:
     port : ${EMAIL_PORT}
     username: ${EMAIL_USERNAME}
     password: ${EMAIL_PW}
+    protocol: smtps
     properties:
       mail.smtp.auth: true
       mail.smtp.enable : true
