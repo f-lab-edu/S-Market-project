@@ -1,14 +1,18 @@
 package com.flab.s_market.user.controller.v1;
 
 import com.flab.s_market.common.ApiResponse;
-import com.flab.s_market.user.dto.AllTermDTO;
-import com.flab.s_market.user.dto.DetailTermDTO;
-import com.flab.s_market.user.dto.EmailDTO;
+import com.flab.s_market.common.exception.CustomException;
+import com.flab.s_market.common.exception.ErrorCode;
+import com.flab.s_market.user.dto.request.EmailCodeDTO;
+import com.flab.s_market.user.dto.response.AllTermDTO;
+import com.flab.s_market.user.dto.response.DetailTermDTO;
+import com.flab.s_market.user.dto.request.EmailDTO;
 import com.flab.s_market.user.service.EmailService;
 import com.flab.s_market.user.service.TermService;
 import com.flab.s_market.user.service.UserService;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
+import java.security.NoSuchAlgorithmException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,5 +56,14 @@ public class UserController {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(ApiResponse.createSuccessWithNoContent());
+    }
+
+    @PostMapping("/verifyCode")
+    public ApiResponse<?> verifyCode(@RequestBody EmailCodeDTO dto) throws NoSuchAlgorithmException {
+        if(emailService.verifyEmailCode(dto.getEmail(), dto.getCode())){
+            //return ApiResponse.createSuccess(emailService.makeMemberId(dto.getEmail()));
+            return ApiResponse.createSuccessWithNoContent();
+        }
+        throw new CustomException(ErrorCode.NOT_VALID_EMAIL_CODE);
     }
 }

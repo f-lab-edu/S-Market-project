@@ -1,10 +1,10 @@
 package com.flab.s_market.user.service;
 
 import com.flab.s_market.user.domain.Term;
-import com.flab.s_market.user.dto.AllTermDTO;
-import com.flab.s_market.user.dto.DetailTermDTO;
-import com.flab.s_market.user.dto.TermDTO;
-import com.flab.s_market.user.dto.TermsDTO;
+import com.flab.s_market.user.dto.response.AllTermDTO;
+import com.flab.s_market.user.dto.response.DetailTermDTO;
+import com.flab.s_market.user.dto.response.TermDTO;
+import com.flab.s_market.user.dto.response.TermsDTO;
 import com.flab.s_market.user.repository.TermRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
