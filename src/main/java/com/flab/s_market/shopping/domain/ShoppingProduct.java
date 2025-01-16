@@ -1,4 +1,4 @@
-package com.flab.s_market.user.domain;
+package com.flab.s_market.shopping.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -7,24 +7,26 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Getter @Setter
-public class UserTerm {
+@AllArgsConstructor
+@NoArgsConstructor
+public class ShoppingProduct {
     @Id @GeneratedValue
-    @Column(name = "user_term_id")
+    @Column(name = "shopping_product_id")
     private Long id;
+    private int productAmount;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "term_id")
-    private Term term;
+    @JoinColumn(name = "shopping_id")
+    private Shopping shopping;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
-
-    private LocalDateTime agreeDate;
+    @JoinColumn(name = "product_id")
+    private Product product;
 }
