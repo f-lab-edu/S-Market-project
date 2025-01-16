@@ -6,7 +6,7 @@ import jakarta.mail.internet.MimeMessage;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.util.Base64;
 import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -59,7 +59,6 @@ public class EmailService {
 
 
     // 메일 반환
-
     private MimeMessage createEmailForm(String email) throws MessagingException {
 
         String authCode = createdCode();
@@ -101,6 +100,7 @@ public class EmailService {
         MessageDigest md = MessageDigest.getInstance("SHA-256");
         md.update(email.getBytes());
         md.update(LocalDateTime.now().toString().getBytes());
-        return Arrays.toString(md.digest());
+        byte[] digest = md.digest();
+        return Base64.getEncoder().encodeToString(digest);
     }
 }

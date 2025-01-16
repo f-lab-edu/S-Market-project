@@ -1,4 +1,4 @@
-package com.flab.s_market.user.dto;
+package com.flab.s_market.user.dto.response;
 
 import java.util.List;
 import lombok.Builder;
