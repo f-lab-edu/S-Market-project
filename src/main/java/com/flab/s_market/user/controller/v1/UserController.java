@@ -1,6 +1,6 @@
 package com.flab.s_market.user.controller.v1;
 
-import com.flab.s_market.common.ApiResponse;
+import com.flab.s_market.common.entity.ApiResponse;
 import com.flab.s_market.common.exception.CustomException;
 import com.flab.s_market.common.exception.ErrorCode;
 import com.flab.s_market.user.dto.request.EmailCodeDTO;
@@ -44,7 +44,7 @@ public class UserController {
         return ApiResponse.createSuccess(termService.getDetailTerms());
     }
 
-    @GetMapping("/checkEmail")
+    @GetMapping("/email/checkDuplicated")
     public ApiResponse<?> getCheckEmailDuplicated(@RequestParam(value = "email") String email){
         userService.checkEmailDuplicated(email);
         return ApiResponse.createSuccessWithNoContent();

@@ -3,34 +3,36 @@ package com.flab.s_market.user.domain;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Getter @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Term {
-    @Id @GeneratedValue
-    @Column(name = "term_id")
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)  // MYSQL에만 있는 기능, 속도빠름
     private Long id;
-    private double version;
+
+    @Column(nullable = false)
+    private Integer version; // 정확히 일치값, 부동소수점 연산(소수점 연산, 정수연산)
+
+    @Column(nullable = false, length = 255)
     private String url;
+
+    @Column(nullable = false, length = 80)
     private String title;
-    private boolean detail;
-    private boolean isRequired;
-    private boolean additional;
 
-    public Term(Long id, double version, String url, String title, boolean detail, boolean isRequired, boolean additional) {
-        this.id = id;
-        this.version = version;
-        this.url = url;
-        this.title = title;
-        this.detail = detail;
-        this.isRequired = isRequired;
-        this.additional = additional;
-    }
+    @Column(nullable = false)
+    private Boolean detail; // main, sub (oneToMany)
 
-    public Term() {
+    @Column(nullable = false)
+    private Boolean isRequired;
 
-    }
+    @Column(nullable = false)
+    private Boolean additional;
 }

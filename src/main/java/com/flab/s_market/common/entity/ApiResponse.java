@@ -1,4 +1,4 @@
-package com.flab.s_market.common;
+package com.flab.s_market.common.entity;
 
 import com.flab.s_market.common.exception.CustomException;
 import jakarta.annotation.Nullable;

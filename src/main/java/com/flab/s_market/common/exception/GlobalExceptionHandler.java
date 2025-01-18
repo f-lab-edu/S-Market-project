@@ -1,6 +1,6 @@
 package com.flab.s_market.common.exception;
 
-import com.flab.s_market.common.ApiResponse;
+import com.flab.s_market.common.entity.ApiResponse;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

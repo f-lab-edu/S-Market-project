@@ -19,7 +19,7 @@ public class TermService {
     private final TermRepository termRepository;
 
     public AllTermDTO getAllTerms(){
-        List<Term> terms = termRepository.findByDetailAndVersion(false, 1.1d);
+        List<Term> terms = termRepository.findByDetailAndVersion(false, 1.1d);//하드코딩x
         List<TermDTO> mainTerm = terms.stream().filter(element -> !element.isAdditional())
             .map(element->TermDTO.builder()
                 .title(element.getTitle())

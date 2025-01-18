@@ -1,0 +1,1 @@
+SQL문=CREATE TABLE..., ENTITY.., USER API 6 다시(전체/세부 중점적으로)
