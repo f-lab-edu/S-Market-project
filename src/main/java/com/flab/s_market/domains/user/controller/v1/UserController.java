@@ -3,12 +3,9 @@ package com.flab.s_market.domains.user.controller.v1;
 import com.flab.s_market.common.entity.ApiResponse;
 import com.flab.s_market.common.exception.CustomException;
 import com.flab.s_market.common.exception.ErrorCode;
-import com.flab.s_market.domains.user.dto.request.EmailDTO;
 import com.flab.s_market.domains.user.dto.request.EmailCodeDTO;
-import com.flab.s_market.domains.user.dto.response.AllTermDTO;
-import com.flab.s_market.domains.user.dto.response.DetailTermDTO;
+import com.flab.s_market.domains.user.dto.request.EmailDTO;
 import com.flab.s_market.domains.user.service.EmailService;
-import com.flab.s_market.domains.term.service.TermService;
 import com.flab.s_market.domains.user.service.UserService;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
@@ -30,19 +27,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/v1/api/user")
 @Validated
 public class UserController {
-    private final TermService termService;
     private final UserService userService;
     private final EmailService emailService;
-
-    @GetMapping("/terms/all")
-    public ApiResponse<AllTermDTO> getAllTerms(){
-        return ApiResponse.createSuccess(termService.getAllTerms());
-    }
-
-    @GetMapping("/terms/detail")
-    public ApiResponse<DetailTermDTO> getDetailTerms(){
-        return ApiResponse.createSuccess(termService.getDetailTerms());
-    }
 
     @GetMapping("/email/checkDuplicated")
     public ApiResponse<?> getCheckEmailDuplicated(@RequestParam(value = "email") String email){

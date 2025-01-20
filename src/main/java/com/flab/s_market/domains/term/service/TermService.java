@@ -1,10 +1,11 @@
 package com.flab.s_market.domains.term.service;
 
-import com.flab.s_market.domains.user.dto.response.AllTermDTO;
 import com.flab.s_market.domains.term.domain.Term;
-import com.flab.s_market.domains.user.dto.response.DetailTermDTO;
-import com.flab.s_market.domains.user.dto.response.TermDTO;
-import com.flab.s_market.domains.user.dto.response.TermsDTO;
+import com.flab.s_market.domains.term.dto.response.AllTermResponseDTO;
+import com.flab.s_market.domains.term.dto.response.DetailTermDTO;
+import com.flab.s_market.domains.term.dto.response.TermResponseDTO;
+import com.flab.s_market.domains.term.dto.response.TermsResponseDTO;
+import com.flab.s_market.domains.term.repository.SubTermRepository;
 import com.flab.s_market.domains.term.repository.TermRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -17,34 +18,32 @@ import org.springframework.transaction.annotation.Transactional;
 public class TermService {
 
     private final TermRepository termRepository;
+    private final SubTermRepository subTermRepository;
+    private static final Integer TERM_VERSION = 1;
+    private static final String mainTitle = "이용약관에 먼저 동의해주세요";
+    private static final String additionalTitle = "신규 가입 회원에게만 드려요.\\n 유니버스 크럽 3개월 무료 이용!";
+    public AllTermResponseDTO getAllTerms(){
+        List<Term> terms = termRepository.findTermByVersionWithJoin(TERM_VERSION);
 
-    public AllTermDTO getAllTerms(){
-        List<Term> terms = null;
-        List<TermDTO> mainTerm = null;
-        List<TermDTO> additionalTerm = null;
+        List<TermResponseDTO> mainTermList =
+            terms.stream()
+                .filter(term -> !term.getAdditional())
+                .map(TermResponseDTO::of)
+                .toList();
 
-        TermsDTO mainTermDTO = TermsDTO.builder()
-            .title("이용약관에 먼저 동의해주세요.")
-            .isRequired(true)
-            .terms(mainTerm)
-            .build();
+        List<TermResponseDTO> additionalTermList =
+            terms.stream()
+                .filter(Term::getAdditional)
+                .map(TermResponseDTO::of)
+                .toList();
 
-        TermsDTO additionalTermDTO = TermsDTO.builder()
-            .title("신규 가입 회원에게만 드려요.\n 유니버스 크럽 3개월 무료 이용!")
-            .isRequired(false)
-            .terms(additionalTerm)
-            .build();
+        TermsResponseDTO mainDto = TermsResponseDTO.convertTermResponseDTOToTermsResponseDTO(mainTitle, mainTermList);
+        TermsResponseDTO additionalDto = TermsResponseDTO.convertTermResponseDTOToTermsResponseDTO(additionalTitle, additionalTermList);
 
-        return AllTermDTO.builder()
-            .main(mainTermDTO)
-            .additional(additionalTermDTO)
-            .build();
+        return AllTermResponseDTO.convertTermsResponseDTOToAllTermResponseDTO(mainDto, additionalDto);
     }
 
     public DetailTermDTO getDetailTerms() {
-        DetailTermDTO dto = null;
-        List<Term> terms = null;
-        Term detailTerm = terms.get(0);
-        return dto;
+        return subTermRepository.findByVersionAndUrl(TERM_VERSION);
     }
 }
