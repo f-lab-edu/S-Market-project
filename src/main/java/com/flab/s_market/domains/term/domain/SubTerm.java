@@ -20,11 +20,11 @@ public class SubTerm {
     @EmbeddedId
     private SubTermId id;
 
-    @Column(nullable = false, length = 255)
-    private String content;
-
     @MapsId("termId")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "term_id")
     private Term term;
+
+    @Column(nullable = false, length = 255)
+    private String url;
 }
