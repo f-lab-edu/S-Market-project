@@ -1,5 +1,6 @@
 package com.flab.s_market.domains.order.domain;
 
+import com.flab.s_market.common.entity.BaseEntity;
 import com.flab.s_market.domains.delivery.domain.Delivery;
 import com.flab.s_market.domains.shopping.domain.Shopping;
 import jakarta.persistence.Column;
@@ -23,7 +24,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "Orders")
-public class Order {
+public class Order extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

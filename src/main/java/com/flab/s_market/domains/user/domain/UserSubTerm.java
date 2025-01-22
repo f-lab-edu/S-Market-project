@@ -1,6 +1,6 @@
-package com.flab.s_market.domains.term.domain;
+package com.flab.s_market.domains.user.domain;
 
-import com.flab.s_market.domains.user.domain.User;
+import com.flab.s_market.common.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
@@ -18,7 +18,7 @@ import lombok.Setter;
 @Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserSubTerm {
+public class UserSubTerm extends BaseEntity {
     @EmbeddedId
     private UserSubTermId id;
 
@@ -29,4 +29,5 @@ public class UserSubTerm {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
 }

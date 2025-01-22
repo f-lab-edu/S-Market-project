@@ -1,5 +1,6 @@
 package com.flab.s_market.domains.user.domain;
 
+import com.flab.s_market.common.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,7 +15,7 @@ import lombok.Setter;
 @Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class User {
+public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -31,4 +32,10 @@ public class User {
     @Column(nullable = false, length = 20)
     private String emailKey;
 
+    public User(String email, String name, String password, String emailKey) {
+        this.email = email;
+        this.name = name;
+        this.password = password;
+        this.emailKey = emailKey;
+    }
 }

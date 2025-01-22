@@ -22,7 +22,15 @@ public class QSubTerm extends EntityPathBase<SubTerm> {
 
     public static final QSubTerm subTerm = new QSubTerm("subTerm");
 
+    public final com.flab.s_market.common.entity.QBaseEntity _super = new com.flab.s_market.common.entity.QBaseEntity(this);
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
+
     public final QSubTermId id;
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> modifiedAt = _super.modifiedAt;
 
     public final QTerm term;
 

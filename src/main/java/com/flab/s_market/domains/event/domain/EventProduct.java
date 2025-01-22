@@ -1,5 +1,6 @@
 package com.flab.s_market.domains.event.domain;
 
+import com.flab.s_market.common.entity.BaseEntity;
 import com.flab.s_market.domains.product.domain.Product;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -17,7 +18,7 @@ import lombok.Setter;
 @Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class EventProduct {
+public class EventProduct extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

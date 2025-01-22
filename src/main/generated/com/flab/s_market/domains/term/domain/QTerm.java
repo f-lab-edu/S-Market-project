@@ -19,11 +19,19 @@ public class QTerm extends EntityPathBase<Term> {
 
     public static final QTerm term = new QTerm("term");
 
+    public final com.flab.s_market.common.entity.QBaseEntity _super = new com.flab.s_market.common.entity.QBaseEntity(this);
+
     public final BooleanPath additional = createBoolean("additional");
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final BooleanPath isRequired = createBoolean("isRequired");
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> modifiedAt = _super.modifiedAt;
 
     public final StringPath title = createString("title");
 

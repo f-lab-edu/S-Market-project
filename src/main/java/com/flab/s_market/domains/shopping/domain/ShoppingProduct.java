@@ -1,5 +1,6 @@
 package com.flab.s_market.domains.shopping.domain;
 
+import com.flab.s_market.common.entity.BaseEntity;
 import com.flab.s_market.domains.product.domain.Product;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -18,7 +19,7 @@ import lombok.Setter;
 @Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ShoppingProduct {
+public class ShoppingProduct extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
