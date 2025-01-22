@@ -1,5 +1,6 @@
 package com.flab.s_market.domains.term.domain;
 
+import com.flab.s_market.common.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
@@ -16,7 +17,7 @@ import lombok.Setter;
 @Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class SubTerm {
+public class SubTerm extends BaseEntity {
     @EmbeddedId
     private SubTermId id;
 

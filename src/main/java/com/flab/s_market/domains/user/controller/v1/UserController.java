@@ -5,14 +5,12 @@ import com.flab.s_market.common.exception.CustomException;
 import com.flab.s_market.common.exception.ErrorCode;
 import com.flab.s_market.domains.user.dto.request.EmailCodeDTO;
 import com.flab.s_market.domains.user.dto.request.EmailDTO;
+import com.flab.s_market.domains.user.dto.request.JoinInfoDTO;
 import com.flab.s_market.domains.user.service.EmailService;
 import com.flab.s_market.domains.user.service.UserService;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
-import java.security.NoSuchAlgorithmException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,19 +35,26 @@ public class UserController {
     }
 
     @PostMapping("/sendCode")
-    public ResponseEntity sendCode(@RequestBody @Valid EmailDTO emailDTO, BindingResult bindingResult) throws MessagingException {
-        emailService.sendEmail(emailDTO.getEmail());
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(ApiResponse.createSuccessWithNoContent());
+    public ApiResponse<?> sendCode(@RequestBody @Valid EmailDTO emailDTO, BindingResult bindingResult) {
+        try {
+            emailService.sendEmail(emailDTO.getEmail());
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        }
+        return ApiResponse.createSuccessWithNoContent();
     }
 
     @PostMapping("/verifyCode")
-    public ApiResponse<?> verifyCode(@RequestBody EmailCodeDTO dto) throws NoSuchAlgorithmException {
+    public ApiResponse<String> verifyCode(@RequestBody EmailCodeDTO dto) {
         if(emailService.verifyEmailCode(dto.getEmail(), dto.getCode())){
-            //return ApiResponse.createSuccess(emailService.makeMemberId(dto.getEmail()));
-            return ApiResponse.createSuccessWithNoContent();
+            return ApiResponse.createSuccess(dto.getEmail());
         }
         throw new CustomException(ErrorCode.NOT_VALID_EMAIL_CODE);
+    }
+
+    @PostMapping("/join")
+    public ApiResponse<?> join(@RequestBody JoinInfoDTO dto, BindingResult bindingResult){
+        userService.join(dto);
+        return ApiResponse.createSuccessWithNoContent();
     }
 }

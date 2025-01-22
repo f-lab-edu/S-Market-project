@@ -1,65 +1,72 @@
 DROP TABLE IF EXISTS `user`;
 
 CREATE TABLE `user` (
-    `id`	BIGINT	NOT NULL,
+    `id`	BIGINT	NOT NULL auto_increment,
     `email`	VARCHAR(50)	NOT NULL,
     `name`	VARCHAR(20)	NOT NULL,
     `password`	VARCHAR(20)	NOT NULL,
-    `email_key`	VARCHAR(20)	NOT NULL
+    `email_key`	VARCHAR(20)	NOT NULL,
+    `created_at`	DATETIME	NOT NULL,
+    `modified_at`	DATETIME	NOT NULL,
+    primary key (id)
 );
 
 DROP TABLE IF EXISTS `product`;
 
 CREATE TABLE `product` (
-    `id`	BIGINT	NOT NULL,
+    `id`	BIGINT	NOT NULL auto_increment,
     `amount`	INT	NOT NULL,
     `price`	INT	NOT NULL,
     `name`	VARCHAR(50)	NOT NULL,
     `created_at`	DATETIME	NOT NULL,
     `modified_at`	DATETIME	NOT NULL,
-    `category_id`	BIGINT	NOT NULL
+    `category_id`	BIGINT	NOT NULL,
+    primary key (id)
 );
 
 DROP TABLE IF EXISTS `event`;
 
 CREATE TABLE `event` (
-    `id`	BIGINT	NOT NULL,
+    `id`	BIGINT	NOT NULL auto_increment,
     `name`	VARCHAR(30)	NOT NULL,
     `start_date`	DATETIME	NULL,
     `end_date`	DATETIME	NULL,
     `created_at`	DATETIME	NOT NULL,
-    `modified_at`	DATETIME	NOT NULL
+    `modified_at`	DATETIME	NOT NULL,
+    primary key (id)
 );
 
 DROP TABLE IF EXISTS `shopping`;
 
 CREATE TABLE `shopping` (
-    `id`	BIGINT	NOT NULL,
+    `id`	BIGINT	NOT NULL auto_increment,
     `user_id`	BIGINT	NOT NULL,
     `created_at`	DATETIME	NOT NULL,
-    `modified_at`	DATETIME	NOT NULL
+    `modified_at`	DATETIME	NOT NULL,
+    primary key (id)
 );
 
 DROP TABLE IF EXISTS `category`;
 
 CREATE TABLE `category` (
-    `id`	BIGINT	NOT NULL,
+    `id`	BIGINT	NOT NULL auto_increment,
     `name`	VARCHAR(20)	NULL,
     `parent_id`	BIGINT	NOT NULL,
     `created_at`	DATETIME	NOT NULL,
-    `modified_at`	DATETIME	NOT NULL
+    `modified_at`	DATETIME	NOT NULL,
+    primary key (id)
 );
 
 DROP TABLE IF EXISTS `term`;
 
 CREATE TABLE `term` (
-    `id`	BIGINT	NOT NULL,
-    `url`	VARCHAR(255)	NULL,
+    `id`	BIGINT	NOT NULL auto_increment,
     `title`	VARCHAR(80)	NOT NULL,
     `is_required`	BIT	NOT NULL,
     `additional`	BIT	NOT NULL,
     `created_at`	DATETIME	NOT NULL,
-    `modified_at`	DATETIME	NOT NULL
+    `modified_at`	DATETIME	NOT NULL,
+    primary key (id)
 );
 
 DROP TABLE IF EXISTS `user_sub_term`;
@@ -70,38 +77,42 @@ CREATE TABLE `user_sub_term` (
     `term_id`	BIGINT	NOT NULL,
     `agree_date`	DATETIME	NOT NULL,
     `created_at`	DATETIME	NOT NULL,
-    `modified_at`	DATETIME	NOT NULL
+    `modified_at`	DATETIME	NOT NULL,
+    primary key (user_id, term_id, version)
 );
 
 DROP TABLE IF EXISTS `shopping_product`;
 
 CREATE TABLE `shopping_product` (
-    `id`	BIGINT	NOT NULL,
+    `id`	BIGINT	NOT NULL auto_increment,
     `product_amount`	INT	NOT NULL,
     `shopping_id`	BIGINT	NOT NULL,
     `product_id`	BIGINT	NOT NULL,
     `created_at`	DATETIME	NOT NULL,
-    `modified_at`	DATETIME	NOT NULL
+    `modified_at`	DATETIME	NOT NULL,
+    primary key (id)
 );
 
 DROP TABLE IF EXISTS `orders`;
 
 CREATE TABLE `orders` (
-    `id`	BIGINT	NOT NULL,
+    `id`	BIGINT	NOT NULL auto_increment,
     `order_date`	DATETIME	NOT NULL,
     `delivery_id`	BIGINT	NOT NULL,
     `shopping_id`	BIGINT	NOT NULL,
     `created_at`	DATETIME	NOT NULL,
-    `modified_at`	DATETIME	NOT NULL
+    `modified_at`	DATETIME	NOT NULL,
+    primary key (id)
 );
 
 DROP TABLE IF EXISTS `delivery`;
 
 CREATE TABLE `delivery` (
-    `id`	BIGINT	NOT NULL,
+    `id`	BIGINT	NOT NULL auto_increment,
     `status`	VARCHAR(30)	NOT NULL,
     `created_at`	DATETIME	NOT NULL,
-    `modified_at`	DATETIME	NOT NULL
+    `modified_at`	DATETIME	NOT NULL,
+    primary key (id)
 );
 
 DROP TABLE IF EXISTS `sub_term`;
@@ -109,49 +120,22 @@ DROP TABLE IF EXISTS `sub_term`;
 CREATE TABLE `sub_term` (
     `version`	INTEGER	NOT NULL,
     `term_id`	BIGINT	NOT NULL,
-    `content`	VARCHAR(255)	NOT NULL,
+    `url`	VARCHAR(255)	NULL,
     `created_at`	DATETIME	NOT NULL,
-    `modified_at`	DATETIME	NOT NULL
+    `modified_at`	DATETIME	NOT NULL,
+    primary key (version, term_id)
 );
 
 DROP TABLE IF EXISTS `event_product`;
 
 CREATE TABLE `event_product` (
-    `id`	BIGINT	NOT NULL,
+    `id`	BIGINT	NOT NULL auto_increment,
     `product_id`	BIGINT	NOT NULL,
-    `event_id`	BIGINT	NOT NULL
+    `event_id`	BIGINT	NOT NULL,
+    `created_at`	DATETIME	NOT NULL,
+    `modified_at`	DATETIME	NOT NULL,
+    primary key (id)
 );
-
-ALTER TABLE `user` ADD CONSTRAINT `PK_USER` PRIMARY KEY (`id`);
-
-ALTER TABLE `product` ADD CONSTRAINT `PK_PRODUCT` PRIMARY KEY (`id`);
-
-ALTER TABLE `event` ADD CONSTRAINT `PK_EVENT` PRIMARY KEY (`id`);
-
-ALTER TABLE `shopping` ADD CONSTRAINT `PK_SHOPPING` PRIMARY KEY (`id`);
-
-ALTER TABLE `category` ADD CONSTRAINT `PK_CATEGORY` PRIMARY KEY (`id`);
-
-ALTER TABLE `term` ADD CONSTRAINT `PK_TERM` PRIMARY KEY (`id`);
-
-ALTER TABLE `user_sub_term` ADD CONSTRAINT `PK_USER_SUB_TERM` PRIMARY KEY (
-    `user_id`,
-    `version`,
-    `term_id`
-    );
-
-ALTER TABLE `shopping_product` ADD CONSTRAINT `PK_SHOPPING_PRODUCT` PRIMARY KEY (`id`);
-
-ALTER TABLE `orders` ADD CONSTRAINT `PK_ORDER` PRIMARY KEY (`id`);
-
-ALTER TABLE `delivery` ADD CONSTRAINT `PK_DELIVERY` PRIMARY KEY (`id`);
-
-ALTER TABLE `sub_term` ADD CONSTRAINT `PK_SUB_TERM` PRIMARY KEY (
-    `version`,
-    `term_id`
-    );
-
-ALTER TABLE `event_product` ADD CONSTRAINT `PK_EVENT_PRODUCT` PRIMARY KEY (`id`);
 
 ALTER TABLE `product` ADD CONSTRAINT `FK_category_TO_product_1` FOREIGN KEY (`category_id`)
     REFERENCES `category` (`id`);
