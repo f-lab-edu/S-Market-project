@@ -24,6 +24,8 @@ public class QOrder extends EntityPathBase<Order> {
 
     public final com.flab.s_market.common.entity.QBaseEntity _super = new com.flab.s_market.common.entity.QBaseEntity(this);
 
+    public final com.flab.s_market.domains.cart.domain.QCart cart;
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
@@ -35,8 +37,6 @@ public class QOrder extends EntityPathBase<Order> {
     public final DateTimePath<java.time.LocalDateTime> modifiedAt = _super.modifiedAt;
 
     public final DateTimePath<java.time.LocalDateTime> orderDate = createDateTime("orderDate", java.time.LocalDateTime.class);
-
-    public final com.flab.s_market.domains.shopping.domain.QShopping shopping;
 
     public QOrder(String variable) {
         this(Order.class, forVariable(variable), INITS);
@@ -56,8 +56,8 @@ public class QOrder extends EntityPathBase<Order> {
 
     public QOrder(Class<? extends Order> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
+        this.cart = inits.isInitialized("cart") ? new com.flab.s_market.domains.cart.domain.QCart(forProperty("cart"), inits.get("cart")) : null;
         this.delivery = inits.isInitialized("delivery") ? new com.flab.s_market.domains.delivery.domain.QDelivery(forProperty("delivery")) : null;
-        this.shopping = inits.isInitialized("shopping") ? new com.flab.s_market.domains.shopping.domain.QShopping(forProperty("shopping"), inits.get("shopping")) : null;
     }
 
 }

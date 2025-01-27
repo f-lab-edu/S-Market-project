@@ -1,4 +1,4 @@
-package com.flab.s_market.domains.shopping.domain;
+package com.flab.s_market.domains.cart.domain;
 
 import com.flab.s_market.common.entity.BaseEntity;
 import com.flab.s_market.domains.user.domain.User;
@@ -18,7 +18,7 @@ import lombok.Setter;
 @Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Shopping extends BaseEntity {
+public class Cart extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

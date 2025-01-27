@@ -1,8 +1,8 @@
 package com.flab.s_market.domains.order.domain;
 
 import com.flab.s_market.common.entity.BaseEntity;
+import com.flab.s_market.domains.cart.domain.Cart;
 import com.flab.s_market.domains.delivery.domain.Delivery;
-import com.flab.s_market.domains.shopping.domain.Shopping;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -36,6 +36,6 @@ public class Order extends BaseEntity {
     private Delivery delivery;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "shopping_id")
-    private Shopping shopping;
+    @JoinColumn(name = "cart_id")
+    private Cart cart;
 }

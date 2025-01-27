@@ -1,4 +1,4 @@
-package com.flab.s_market.domains.shopping.domain;
+package com.flab.s_market.domains.cart.domain;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -14,7 +14,7 @@ import com.querydsl.core.types.dsl.PathInits;
  * QShopping is a Querydsl query type for Shopping
  */
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
-public class QShopping extends EntityPathBase<Shopping> {
+public class QShopping extends EntityPathBase<Cart> {
 
     private static final long serialVersionUID = -546181705L;
 
@@ -35,10 +35,10 @@ public class QShopping extends EntityPathBase<Shopping> {
     public final com.flab.s_market.domains.user.domain.QUser user;
 
     public QShopping(String variable) {
-        this(Shopping.class, forVariable(variable), INITS);
+        this(Cart.class, forVariable(variable), INITS);
     }
 
-    public QShopping(Path<? extends Shopping> path) {
+    public QShopping(Path<? extends Cart> path) {
         this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
@@ -47,10 +47,10 @@ public class QShopping extends EntityPathBase<Shopping> {
     }
 
     public QShopping(PathMetadata metadata, PathInits inits) {
-        this(Shopping.class, metadata, inits);
+        this(Cart.class, metadata, inits);
     }
 
-    public QShopping(Class<? extends Shopping> type, PathMetadata metadata, PathInits inits) {
+    public QShopping(Class<? extends Cart> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.user = inits.isInitialized("user") ? new com.flab.s_market.domains.user.domain.QUser(forProperty("user")) : null;
     }

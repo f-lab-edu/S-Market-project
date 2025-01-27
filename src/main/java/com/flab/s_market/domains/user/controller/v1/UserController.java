@@ -29,32 +29,32 @@ public class UserController {
     private final EmailService emailService;
 
     @GetMapping("/email/checkDuplicated")
-    public ApiResponse<?> getCheckEmailDuplicated(@RequestParam(value = "email") String email){
+    public void getCheckEmailDuplicated(@RequestParam(value = "email") String email){
         userService.checkEmailDuplicated(email);
-        return ApiResponse.createSuccessWithNoContent();
     }
 
     @PostMapping("/sendCode")
-    public ApiResponse<?> sendCode(@RequestBody @Valid EmailDTO emailDTO, BindingResult bindingResult) {
+    public void sendCode(@RequestBody @Valid EmailDTO emailDTO, BindingResult bindingResult) {
+
         try {
             emailService.sendEmail(emailDTO.getEmail());
         } catch (MessagingException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e); // -> customException
         }
-        return ApiResponse.createSuccessWithNoContent();
     }
-
     @PostMapping("/verifyCode")
+    // 암호키 주기 (대칭키)AES-2048, 1024
     public ApiResponse<String> verifyCode(@RequestBody EmailCodeDTO dto) {
-        if(emailService.verifyEmailCode(dto.getEmail(), dto.getCode())){
-            return ApiResponse.createSuccess(dto.getEmail());
+        if(emailService.verifyEmailCode(dto.getEmail(), dto.getCode())){ //
+            return ApiResponse.createSuccess(dto.getEmail()); // 암호화 값을 던지기
         }
         throw new CustomException(ErrorCode.NOT_VALID_EMAIL_CODE);
     }
 
     @PostMapping("/join")
-    public ApiResponse<?> join(@RequestBody JoinInfoDTO dto, BindingResult bindingResult){
+    // 암호키
+    public void join(@RequestBody JoinInfoDTO dto, BindingResult bindingResult){
         userService.join(dto);
-        return ApiResponse.createSuccessWithNoContent();
     }
+
 }

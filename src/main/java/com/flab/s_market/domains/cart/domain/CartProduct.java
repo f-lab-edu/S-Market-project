@@ -1,4 +1,4 @@
-package com.flab.s_market.domains.shopping.domain;
+package com.flab.s_market.domains.cart.domain;
 
 import com.flab.s_market.common.entity.BaseEntity;
 import com.flab.s_market.domains.product.domain.Product;
@@ -19,7 +19,7 @@ import lombok.Setter;
 @Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ShoppingProduct extends BaseEntity {
+public class CartProduct extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -27,8 +27,8 @@ public class ShoppingProduct extends BaseEntity {
     private int productAmount;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "shopping_id", nullable = false)
-    private Shopping shopping;
+    @JoinColumn(name = "cart_id", nullable = false)
+    private Cart cart;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
