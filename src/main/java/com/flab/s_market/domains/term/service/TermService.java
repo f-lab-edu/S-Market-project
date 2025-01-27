@@ -19,19 +19,17 @@ public class TermService {
 
     private final TermRepository termRepository;
     private final SubTermRepository subTermRepository;
-    private static final Integer TERM_VERSION = 1;
     private static final String mainTitle = "이용약관에 먼저 동의해주세요";
     private static final String additionalTitle = "신규 가입 회원에게만 드려요.\\n 유니버스 크럽 3개월 무료 이용!";
     public AllTermResponseDTO getAllTerms(){
-        List<Term> terms = termRepository.findTermByVersionWithJoin(TERM_VERSION); //이상하다?? 최신
-        // 1. query 2. stream()
+        List<Term> terms = termRepository.findAll();
+
         List<TermResponseDTO> mainTermList =
             terms.stream()
                 .filter(term -> !term.getAdditional())
-//                .collect(Collectors.groupingBy()) // map리턴
                 .map(TermResponseDTO::of)
                 .toList();
-        // 신세계 멤버십
+
         List<TermResponseDTO> additionalTermList =
             terms.stream()
                 .filter(Term::getAdditional)
@@ -45,6 +43,6 @@ public class TermService {
     }
 
     public DetailTermDTO getDetailTerms() {
-        return subTermRepository.findByVersionAndUrl(TERM_VERSION);
+        return subTermRepository.findByVersionAndUrl();
     }
 }
