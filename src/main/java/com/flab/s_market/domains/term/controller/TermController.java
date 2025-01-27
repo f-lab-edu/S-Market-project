@@ -22,7 +22,7 @@ public class TermController {
         return ApiResponse.createSuccess(termService.getAllTerms());
     }
 
-    @GetMapping("/terms/detail")
+    @GetMapping("/terms/detail") // term_id, version
     public ApiResponse<DetailTermDTO> getDetailTerms(){
         return ApiResponse.createSuccess(termService.getDetailTerms());
     }

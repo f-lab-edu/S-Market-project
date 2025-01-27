@@ -1,132 +1,141 @@
-DROP TABLE IF EXISTS `user`;
+# DROP TABLE IF EXISTS `user`;
 
 CREATE TABLE `user` (
     `id`	BIGINT	NOT NULL auto_increment,
     `email`	VARCHAR(50)	NOT NULL,
     `name`	VARCHAR(20)	NOT NULL,
     `password`	VARCHAR(20)	NOT NULL,
-    `email_key`	VARCHAR(20)	NOT NULL,
     `created_at`	DATETIME	NOT NULL,
     `modified_at`	DATETIME	NOT NULL,
     primary key (id)
 );
 
-DROP TABLE IF EXISTS `product`;
+CREATE UNIQUE INDEX email ON user(`email`);
 
-CREATE TABLE `product` (
-    `id`	BIGINT	NOT NULL auto_increment,
-    `amount`	INT	NOT NULL,
-    `price`	INT	NOT NULL,
-    `name`	VARCHAR(50)	NOT NULL,
-    `created_at`	DATETIME	NOT NULL,
-    `modified_at`	DATETIME	NOT NULL,
-    `category_id`	BIGINT	NOT NULL,
-    primary key (id)
-);
-
-DROP TABLE IF EXISTS `event`;
-
-CREATE TABLE `event` (
-    `id`	BIGINT	NOT NULL auto_increment,
-    `name`	VARCHAR(30)	NOT NULL,
-    `start_date`	DATETIME	NULL,
-    `end_date`	DATETIME	NULL,
-    `created_at`	DATETIME	NOT NULL,
-    `modified_at`	DATETIME	NOT NULL,
-    primary key (id)
-);
-
-DROP TABLE IF EXISTS `shopping`;
-
-CREATE TABLE `shopping` (
-    `id`	BIGINT	NOT NULL auto_increment,
-    `user_id`	BIGINT	NOT NULL,
-    `created_at`	DATETIME	NOT NULL,
-    `modified_at`	DATETIME	NOT NULL,
-    primary key (id)
-);
-
-DROP TABLE IF EXISTS `category`;
-
-CREATE TABLE `category` (
-    `id`	BIGINT	NOT NULL auto_increment,
-    `name`	VARCHAR(20)	NULL,
-    `parent_id`	BIGINT	NOT NULL,
-    `created_at`	DATETIME	NOT NULL,
-    `modified_at`	DATETIME	NOT NULL,
-    primary key (id)
-);
-
-DROP TABLE IF EXISTS `term`;
+# DROP TABLE IF EXISTS `term`;
 
 CREATE TABLE `term` (
     `id`	BIGINT	NOT NULL auto_increment,
-    `title`	VARCHAR(80)	NOT NULL,
-    `is_required`	BIT	NOT NULL,
-    `additional`	BIT	NOT NULL,
+    `title`	VARCHAR(80)	NOT NULL COMMENT '약관 제목',
+    `is_required`	BIT	NOT NULL COMMENT '약관 필수동의 여부',
+    `additional`	BIT	NOT NULL COMMENT '추가 약관 여부',
     `created_at`	DATETIME	NOT NULL,
     `modified_at`	DATETIME	NOT NULL,
     primary key (id)
 );
 
-DROP TABLE IF EXISTS `user_sub_term`;
+# DROP TABLE IF EXISTS `sub_term`;
+
+CREATE TABLE `sub_term` (
+    `term_id`	BIGINT	NOT NULL COMMENT 'term 테이블의 id값',
+    `version`	INTEGER	NOT NULL COMMENT '약관 버전',
+    `url`	VARCHAR(255)	NULL COMMENT '약관 링크',
+    `created_at`	DATETIME	NOT NULL,
+    `modified_at`	DATETIME	NOT NULL,
+    primary key (term_id, version)
+);
+
+
+# DROP TABLE IF EXISTS `user_sub_term`;
 
 CREATE TABLE `user_sub_term` (
     `user_id`	BIGINT	NOT NULL,
-    `version`	INTEGER	NOT NULL,
     `term_id`	BIGINT	NOT NULL,
-    `agree_date`	DATETIME	NOT NULL,
+    `version`	INTEGER	NOT NULL COMMENT '약관 버전',
+    `agree_date`	DATETIME	NOT NULL COMMENT'동의한 날짜',
     `created_at`	DATETIME	NOT NULL,
     `modified_at`	DATETIME	NOT NULL,
     primary key (user_id, term_id, version)
 );
 
-DROP TABLE IF EXISTS `shopping_product`;
+# DROP TABLE IF EXISTS `product`;
 
-CREATE TABLE `shopping_product` (
+CREATE TABLE `product` (
     `id`	BIGINT	NOT NULL auto_increment,
-    `product_amount`	INT	NOT NULL,
-    `shopping_id`	BIGINT	NOT NULL,
+    `amount`	INT	NOT NULL COMMENT '재고',
+    `price`	INT	NOT NULL COMMENT '가격',
+    `name`	VARCHAR(50)	NOT NULL COMMENT '제품명',
+    `created_at`	DATETIME	NOT NULL,
+    `modified_at`	DATETIME	NOT NULL,
+    `category_id`	BIGINT	NOT NULL,
+    primary key (id)
+);
+CREATE INDEX category_id ON product(`category_id`);
+
+# DROP TABLE IF EXISTS `event`;
+
+CREATE TABLE `event` (
+    `id`	BIGINT	NOT NULL auto_increment,
+    `name`	VARCHAR(30)	NOT NULL COMMENT '이벤트명',
+    `start_date`	DATETIME	NULL COMMENT '이벤트 시작일',
+    `end_date`	DATETIME	NULL COMMENT '이벤트 종료일',
+    `created_at`	DATETIME	NOT NULL,
+    `modified_at`	DATETIME	NOT NULL,
+    primary key (id)
+);
+
+# DROP TABLE IF EXISTS `cart`;
+
+CREATE TABLE `cart` (
+    `id`	BIGINT	NOT NULL auto_increment,
+    `user_id`	BIGINT	NOT NULL,
+    `created_at`	DATETIME	NOT NULL,
+    `modified_at`	DATETIME	NOT NULL,
+    primary key (id)
+);
+CREATE INDEX user_id ON cart(`user_id`);
+
+# DROP TABLE IF EXISTS `category`;
+
+CREATE TABLE `category` (
+    `id`	BIGINT	NOT NULL auto_increment,
+    `name`	VARCHAR(20)	NULL COMMENT '카테고리명',
+    `parent_id`	BIGINT	NOT NULL,
+    `created_at`	DATETIME	NOT NULL,
+    `modified_at`	DATETIME	NOT NULL,
+    primary key (id)
+);
+CREATE INDEX parent_id on category(`parent_id`);
+
+# DROP TABLE IF EXISTS `cart_product`;
+
+CREATE TABLE `cart_product` (
+    `id`	BIGINT	NOT NULL auto_increment,
+    `product_amount`	INT	NOT NULL COMMENT '주문한 상품 갯수',
+    `cart_id`	BIGINT	NOT NULL,
     `product_id`	BIGINT	NOT NULL,
     `created_at`	DATETIME	NOT NULL,
     `modified_at`	DATETIME	NOT NULL,
     primary key (id)
 );
+CREATE INDEX cart_id on cart_product(`cart_id`);
+CREATE INDEX product_id on cart_product(`product_id`);
 
-DROP TABLE IF EXISTS `orders`;
+# DROP TABLE IF EXISTS `orders`;
 
 CREATE TABLE `orders` (
     `id`	BIGINT	NOT NULL auto_increment,
-    `order_date`	DATETIME	NOT NULL,
+    `order_date`	DATETIME	NOT NULL COMMENT '주문일',
     `delivery_id`	BIGINT	NOT NULL,
-    `shopping_id`	BIGINT	NOT NULL,
+    `cart_id`	BIGINT	NOT NULL,
     `created_at`	DATETIME	NOT NULL,
     `modified_at`	DATETIME	NOT NULL,
     primary key (id)
 );
+CREATE INDEX delivery_id on `orders`(`delivery_id`);
+CREATE INDEX cart_id on `orders`(`cart_id`);
 
-DROP TABLE IF EXISTS `delivery`;
+# DROP TABLE IF EXISTS `delivery`;
 
 CREATE TABLE `delivery` (
     `id`	BIGINT	NOT NULL auto_increment,
-    `status`	VARCHAR(30)	NOT NULL,
+    `status`	VARCHAR(30)	NOT NULL COMMENT '배송 상태',
     `created_at`	DATETIME	NOT NULL,
     `modified_at`	DATETIME	NOT NULL,
     primary key (id)
 );
 
-DROP TABLE IF EXISTS `sub_term`;
-
-CREATE TABLE `sub_term` (
-    `version`	INTEGER	NOT NULL,
-    `term_id`	BIGINT	NOT NULL,
-    `url`	VARCHAR(255)	NULL,
-    `created_at`	DATETIME	NOT NULL,
-    `modified_at`	DATETIME	NOT NULL,
-    primary key (version, term_id)
-);
-
-DROP TABLE IF EXISTS `event_product`;
+# DROP TABLE IF EXISTS `event_product`;
 
 CREATE TABLE `event_product` (
     `id`	BIGINT	NOT NULL auto_increment,
@@ -136,40 +145,7 @@ CREATE TABLE `event_product` (
     `modified_at`	DATETIME	NOT NULL,
     primary key (id)
 );
+CREATE INDEX product_id on `event_product`(`product_id`);
+CREATE INDEX event_id on `event_product`(`event_id`);
 
-ALTER TABLE `product` ADD CONSTRAINT `FK_category_TO_product_1` FOREIGN KEY (`category_id`)
-    REFERENCES `category` (`id`);
-
-ALTER TABLE `shopping` ADD CONSTRAINT `FK_user_TO_shopping_1` FOREIGN KEY (`user_id`)
-    REFERENCES `user` (`id`);
-
-ALTER TABLE `category` ADD CONSTRAINT `FK_category_TO_category_1` FOREIGN KEY (`parent_id`)
-    REFERENCES `category` (`id`);
-
-ALTER TABLE `user_sub_term` ADD CONSTRAINT `FK_user_TO_user_sub_term_1` FOREIGN KEY (`user_id`)
-    REFERENCES `user` (`id`);
-
-ALTER TABLE `user_sub_term` ADD CONSTRAINT `FK_sub_term_TO_user_sub_term_1` FOREIGN KEY (`version`, `term_id`)
-    REFERENCES `sub_term` (`version`, `term_id`);
-
-ALTER TABLE `shopping_product` ADD CONSTRAINT `FK_shopping_TO_shopping_product_1` FOREIGN KEY (`shopping_id`)
-    REFERENCES `shopping` (`id`);
-
-ALTER TABLE `shopping_product` ADD CONSTRAINT `FK_product_TO_shopping_product_1` FOREIGN KEY (`product_id`)
-    REFERENCES `product` (`id`);
-
-ALTER TABLE `orders` ADD CONSTRAINT `FK_delivery_TO_order_1` FOREIGN KEY (`delivery_id`)
-    REFERENCES `delivery` (`id`);
-
-ALTER TABLE `orders` ADD CONSTRAINT `FK_shopping_TO_order_1` FOREIGN KEY (`shopping_id`)
-    REFERENCES `shopping` (`id`);
-
-ALTER TABLE `sub_term` ADD CONSTRAINT `FK_Term_TO_sub_term_1` FOREIGN KEY (`term_id`)
-    REFERENCES `term` (`id`);
-
-ALTER TABLE `event_product` ADD CONSTRAINT `FK_product_TO_event_product_1` FOREIGN KEY (`product_id`)
-    REFERENCES `product` (`id`);
-
-ALTER TABLE `event_product` ADD CONSTRAINT `FK_event_TO_event_product_1` FOREIGN KEY (`event_id`)
-    REFERENCES `event` (`id`);
-
+commit;

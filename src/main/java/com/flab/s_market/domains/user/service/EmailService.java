@@ -83,6 +83,7 @@ public class EmailService {
 
         MimeMessage emailForm = createEmailForm(toEmail);
 
+        //try-catch ->customException
         mailSender.send(emailForm);
     }
 
@@ -91,9 +92,9 @@ public class EmailService {
         String codeFoundByEmail = redisUtil.getData(email);
         System.out.println(codeFoundByEmail);
         if (codeFoundByEmail == null) {
-            return false;
+            return false; // 예외던지기
         }
-        return codeFoundByEmail.equals(code);
+        return codeFoundByEmail.equals(code); // 일치하지않으면 예외던지기
     }
 
     public String makeMemberId(String email) throws NoSuchAlgorithmException {
