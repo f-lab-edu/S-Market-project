@@ -42,7 +42,8 @@ public class TermService {
         return AllTermResponseDTO.convertTermsResponseDTOToAllTermResponseDTO(mainDto, additionalDto);
     }
 
-    public DetailTermDTO getDetailTerms() {
-        return subTermRepository.findByVersionAndUrl();
+    public DetailTermDTO getDetailTerms(Long termId, Integer version) {
+
+        return subTermRepository.findByTermIdAndVersion(termId, version);
     }
 }

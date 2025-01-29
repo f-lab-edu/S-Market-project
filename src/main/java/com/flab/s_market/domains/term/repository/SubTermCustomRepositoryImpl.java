@@ -15,7 +15,7 @@ public class SubTermCustomRepositoryImpl implements SubTermCustomRepository{
     }
 
     @Override
-    public DetailTermDTO findByVersionAndUrl() {
+    public DetailTermDTO findByTermIdAndVersion(Long termId, Integer version) {
         QSubTerm subTerm = QSubTerm.subTerm;
 
         return queryFactory
@@ -25,8 +25,7 @@ public class SubTermCustomRepositoryImpl implements SubTermCustomRepository{
                 subTerm.term.title
             ))
             .from(subTerm)
-            .orderBy(subTerm.id.version.desc())
-            .limit(1)
+            .where(subTerm.id.termId.eq(termId), subTerm.id.version.eq(version))
             .fetchOne();
     }
 }
