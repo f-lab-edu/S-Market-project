@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -22,8 +23,11 @@ public class TermController {
         return ApiResponse.createSuccess(termService.getAllTerms());
     }
 
-    @GetMapping("/terms/detail") // term_id, version
-    public ApiResponse<DetailTermDTO> getDetailTerms(){
-        return ApiResponse.createSuccess(termService.getDetailTerms());
+    @GetMapping("/terms/detail")
+    public ApiResponse<DetailTermDTO> getDetailTerms(
+        @RequestParam(name = "termId") Long termId,
+        @RequestParam(name = "version") Integer version
+    ){
+        return ApiResponse.createSuccess(termService.getDetailTerms(termId, version));
     }
 }
