@@ -35,9 +35,9 @@ public class UserService {
     }
 
     public void join(JoinInfoDTO dto) {
-        String password = dto.getPassword();
-        String confirmPassword = dto.getConfirmPassword();
-        List<AgreedTermDTO> terms = dto.getAgreedTerms();
+        String password = dto.password();
+        String confirmPassword = dto.confirmPassword();
+        List<AgreedTermDTO> terms = dto.agreedTerms();
         List<SubTerm> agreedTerms = new ArrayList<>();
 
         if(!password.equals(confirmPassword)){
@@ -45,8 +45,7 @@ public class UserService {
         }
         // + 필수약관 전부 동의했나? term-subTerm 모두 가져오기
         for (AgreedTermDTO term : terms) {
-            SubTerm findTerm = termRepository.findByTitleAndVersionWithJoin(term.getTitle(),
-                term.getVersion())
+            SubTerm findTerm = termRepository.findByTitleAndVersionWithJoin(term.title(), term.version())
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_TERM));
 
             agreedTerms.add(findTerm);

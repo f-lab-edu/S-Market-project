@@ -19,7 +19,8 @@ public class SubTermCustomRepositoryImpl implements SubTermCustomRepository{
         QSubTerm subTerm = QSubTerm.subTerm;
 
         return queryFactory
-            .select(Projections.constructor(DetailTermDTO.class,
+            .select(Projections.constructor(
+                DetailTermDTO.class,
                 subTerm.url,
                 subTerm.id.version,
                 subTerm.term.title
