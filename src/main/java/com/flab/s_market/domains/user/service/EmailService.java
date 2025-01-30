@@ -1,8 +1,10 @@
 package com.flab.s_market.domains.user.service;
 
+import com.flab.s_market.common.config.AES128Config;
 import com.flab.s_market.common.exception.CustomException;
 import com.flab.s_market.common.exception.ErrorCode;
 import com.flab.s_market.common.util.RedisUtil;
+import com.flab.s_market.domains.user.dto.request.EmailCodeDTO;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import java.security.MessageDigest;
@@ -27,6 +29,7 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 public class EmailService {
     private final JavaMailSender mailSender;
     private final RedisUtil redisUtil;
+    private final AES128Config aes128Config;
     private Logger log = LoggerFactory.getLogger(EmailService.class);
 
     @Value("${spring.mail.username}")
@@ -95,13 +98,22 @@ public class EmailService {
     }
 
     // 코드 검증
-    public Boolean verifyEmailCode(String email, String code) {
-        String codeFoundByEmail = redisUtil.getData(email);
+    public String verifyEmailCode(EmailCodeDTO dto){
+        String email = dto.email();
+        String code = dto.code();
+        String codeFoundByEmail = redisUtil.getData(dto.email());
         System.out.println(codeFoundByEmail);
         if (codeFoundByEmail == null) {
-            return false; // 예외던지기
+            throw new CustomException(ErrorCode.NOT_VALID_EMAIL_CODE,
+                Map.of("email", email, "emailCode", code), log::info);
         }
-        return codeFoundByEmail.equals(code); // 일치하지않으면 예외던지기
+        redisUtil.deleteData(email);
+        String emailKey = aes128Config.encryptAes(email);
+        redisUtil.setDataExpire(email, emailKey, 60*30L);
+
+        log.info("enc = {}", emailKey);
+
+        return emailKey;
     }
 
     public String makeMemberId(String email) throws NoSuchAlgorithmException {

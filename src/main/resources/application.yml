@@ -41,3 +41,6 @@ spring:
 server:
   address: ${SERVER_HOST}
   port: ${SERVER_PORT}
+
+aes:
+  secret-key : ${AES_SECRET_KEY}
