@@ -8,7 +8,6 @@ import com.flab.s_market.domains.user.dto.request.EmailDTO;
 import com.flab.s_market.domains.user.dto.request.JoinInfoDTO;
 import com.flab.s_market.domains.user.service.EmailService;
 import com.flab.s_market.domains.user.service.UserService;
-import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.BindingResult;
@@ -35,18 +34,13 @@ public class UserController {
 
     @PostMapping("/sendCode")
     public void sendCode(@RequestBody @Valid EmailDTO emailDTO, BindingResult bindingResult) {
-
-        try {
-            emailService.sendEmail(emailDTO.getEmail());
-        } catch (MessagingException e) {
-            throw new RuntimeException(e); // -> customException
-        }
+        emailService.sendEmail(emailDTO.email());
     }
     @PostMapping("/verifyCode")
     // 암호키 주기 (대칭키)AES-2048, 1024
     public ApiResponse<String> verifyCode(@RequestBody EmailCodeDTO dto) {
-        if(emailService.verifyEmailCode(dto.getEmail(), dto.getCode())){ //
-            return ApiResponse.createSuccess(dto.getEmail()); // 암호화 값을 던지기
+        if(emailService.verifyEmailCode(dto.email(), dto.code())){ //
+            return ApiResponse.createSuccess(dto.email()); // 암호화 값을 던지기
         }
         throw new CustomException(ErrorCode.NOT_VALID_EMAIL_CODE);
     }

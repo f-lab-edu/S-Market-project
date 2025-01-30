@@ -27,19 +27,19 @@ public class TermService {
         List<TermResponseDTO> mainTermList =
             terms.stream()
                 .filter(term -> !term.getAdditional())
-                .map(TermResponseDTO::of)
+                .map(TermResponseDTO::from)
                 .toList();
 
         List<TermResponseDTO> additionalTermList =
             terms.stream()
                 .filter(Term::getAdditional)
-                .map(TermResponseDTO::of)
+                .map(TermResponseDTO::from)
                 .toList();
 
-        TermsResponseDTO mainDto = TermsResponseDTO.convertTermResponseDTOToTermsResponseDTO(mainTitle, mainTermList);
-        TermsResponseDTO additionalDto = TermsResponseDTO.convertTermResponseDTOToTermsResponseDTO(additionalTitle, additionalTermList);
+        TermsResponseDTO mainDto = TermsResponseDTO.from(mainTitle, mainTermList);
+        TermsResponseDTO additionalDto = TermsResponseDTO.from(additionalTitle, additionalTermList);
 
-        return AllTermResponseDTO.convertTermsResponseDTOToAllTermResponseDTO(mainDto, additionalDto);
+        return AllTermResponseDTO.from(mainDto, additionalDto);
     }
 
     public DetailTermDTO getDetailTerms(Long termId, Integer version) {

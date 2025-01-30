@@ -1,5 +1,7 @@
 package com.flab.s_market.domains.user.service;
 
+import com.flab.s_market.common.exception.CustomException;
+import com.flab.s_market.common.exception.ErrorCode;
 import com.flab.s_market.common.util.RedisUtil;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -7,8 +9,11 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.Base64;
+import java.util.Map;
 import java.util.Random;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -22,6 +27,7 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 public class EmailService {
     private final JavaMailSender mailSender;
     private final RedisUtil redisUtil;
+    private Logger log = LoggerFactory.getLogger(EmailService.class);
 
     @Value("${spring.mail.username}")
     private String configEmail;
@@ -76,15 +82,16 @@ public class EmailService {
 
 
     // 메일 보내기
-    public void sendEmail(String toEmail) throws MessagingException {
+    public void sendEmail(String toEmail){
         if (redisUtil.existData(toEmail)) {
             redisUtil.deleteData(toEmail);
         }
-
-        MimeMessage emailForm = createEmailForm(toEmail);
-
-        //try-catch ->customException
-        mailSender.send(emailForm);
+        try {
+            MimeMessage emailForm = createEmailForm(toEmail);
+            mailSender.send(emailForm);
+        }catch(Exception e){
+            throw new CustomException(ErrorCode.MAIL_SYSTEM_ERROR, Map.of("email", toEmail), log::warn);
+        }
     }
 
     // 코드 검증
