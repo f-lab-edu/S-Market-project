@@ -40,7 +40,6 @@ public class UserController {
     }
 
     @PostMapping("/join")
-    // 암호키
     public void join(@RequestBody JoinInfoDTO dto, BindingResult bindingResult){
         userService.join(dto);
     }

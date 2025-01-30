@@ -3,12 +3,12 @@ package com.flab.s_market.domains.user.service;
 import com.flab.s_market.common.config.AES128Config;
 import com.flab.s_market.common.exception.CustomException;
 import com.flab.s_market.common.exception.ErrorCode;
-import com.flab.s_market.common.util.RedisUtil;
 import com.flab.s_market.domains.user.dto.request.EmailCodeDTO;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.Map;
@@ -17,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
@@ -28,7 +30,7 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 @RequiredArgsConstructor
 public class EmailService {
     private final JavaMailSender mailSender;
-    private final RedisUtil redisUtil;
+    private final StringRedisTemplate redisTemplate;
     private final AES128Config aes128Config;
     private Logger log = LoggerFactory.getLogger(EmailService.class);
 
@@ -77,8 +79,7 @@ public class EmailService {
         message.setSubject("S market 인증 코드");
         message.setFrom(configEmail);
         message.setText(setContext(authCode), "utf-8", "html");
-
-        redisUtil.setDataExpire(email, authCode, 60 * 30L);
+        setDataExpire(email, authCode, 60 * 30L);
 
         return message;
     }
@@ -86,8 +87,8 @@ public class EmailService {
 
     // 메일 보내기
     public void sendEmail(String toEmail){
-        if (redisUtil.existData(toEmail)) {
-            redisUtil.deleteData(toEmail);
+        if (existData(toEmail)) {
+            deleteData(toEmail);
         }
         try {
             MimeMessage emailForm = createEmailForm(toEmail);
@@ -101,15 +102,15 @@ public class EmailService {
     public String verifyEmailCode(EmailCodeDTO dto){
         String email = dto.email();
         String code = dto.code();
-        String codeFoundByEmail = redisUtil.getData(dto.email());
+        String codeFoundByEmail = getData(dto.email());
         System.out.println(codeFoundByEmail);
         if (codeFoundByEmail == null) {
             throw new CustomException(ErrorCode.NOT_VALID_EMAIL_CODE,
                 Map.of("email", email, "emailCode", code), log::info);
         }
-        redisUtil.deleteData(email);
+        deleteData(email);
         String emailKey = aes128Config.encryptAes(email);
-        redisUtil.setDataExpire(email, emailKey, 60*30L);
+        setDataExpire(email, emailKey, 60*30L);
 
         log.info("enc = {}", emailKey);
 
@@ -122,5 +123,24 @@ public class EmailService {
         md.update(LocalDateTime.now().toString().getBytes());
         byte[] digest = md.digest();
         return Base64.getEncoder().encodeToString(digest);
+    }
+
+    public void setDataExpire(String key, String value, long duration) {
+        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
+        Duration expireDuration = Duration.ofSeconds(duration);
+        valueOperations.set(key, value, expireDuration);
+    }
+
+    public String getData(String key) {
+        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
+        return valueOperations.get(key);
+    }
+
+    public boolean existData(String key) {
+        return Boolean.TRUE.equals(redisTemplate.hasKey(key));
+    }
+
+    public void deleteData(String key) {
+        redisTemplate.delete(key);
     }
 }

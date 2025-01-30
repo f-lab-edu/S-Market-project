@@ -29,6 +29,9 @@ dependencies {
 	implementation 'org.thymeleaf:thymeleaf:3.0.15.RELEASE'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
+	// spring security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
 	// email authentication code send
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	implementation 'org.springframework.data:spring-data-redis:2.7.5'
