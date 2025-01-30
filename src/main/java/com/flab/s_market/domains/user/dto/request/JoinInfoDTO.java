@@ -8,8 +8,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public record JoinInfoDTO (
-    @NotBlank(message = "이메일을 입력해주세요.")
-    String email,
+    @NotBlank(message = "이메일 키를 입력해주세요.")
+    String emailKey,
     @NotBlank(message = "이름을 입력해주세요.")
     String userName,
     @NotBlank(message = "비밀번호를 입력해주세요.")
@@ -18,8 +18,8 @@ public record JoinInfoDTO (
     String confirmPassword,
     List<AgreedTermDTO> agreedTerms
     ){
-    public User toUserEntity() {
-        return new User(email, userName, password);
+    public User toUserEntity(String email, String encPassword) {
+        return new User(email, userName, encPassword);
     }
     public UserSubTerm toUserSubTermEntity(UserSubTermId id, LocalDateTime agreeDate, User user){
         return new UserSubTerm(id, agreeDate, user);

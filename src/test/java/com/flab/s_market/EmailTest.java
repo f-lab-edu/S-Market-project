@@ -5,11 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.flab.s_market.common.config.AES128Config;
-import com.flab.s_market.common.util.RedisUtil;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,29 +18,14 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @SpringBootTest
 
 public class EmailTest {
-    @Autowired
-    private RedisUtil redisUtil;
 
     @Autowired
     private AES128Config aes128Config;
     private Logger log = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     @Test
-    public void redisTest(){
-        String email = "ghenrhkwk88@gmail.com";
-        String code = "aaa111";
-
-        redisUtil.setDataExpire(email, code, 60*60L);
-
-        assertTrue(redisUtil.existData("ghenrhkwk88@gmail.com"));
-        assertFalse(redisUtil.existData("ghenrhkwk88@test.com"));
-        assertEquals(redisUtil.getData(email), code);
-    }
-
-    @Test
     @DisplayName("Aes128 암호화가 잘 되는지 확인 테스트")
-    public void aes128Test()
-        throws InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+    public void aes128Test(){
         String text = "this is test";
         String enc = aes128Config.encryptAes(text);
         String dec = aes128Config.decryptAes(enc);

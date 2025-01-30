@@ -1,5 +1,6 @@
 package com.flab.s_market.domains.user.service;
 
+import com.flab.s_market.common.config.AES128Config;
 import com.flab.s_market.common.exception.CustomException;
 import com.flab.s_market.common.exception.ErrorCode;
 import com.flab.s_market.domains.term.domain.SubTerm;
@@ -13,9 +14,11 @@ import com.flab.s_market.domains.user.repository.UserSubTermRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,34 +30,53 @@ public class UserService {
     private final UserRepository userRepository;
     private final TermRepository termRepository;
     private final UserSubTermRepository userSubTermRepository;
+    private final EmailService emailService;
+    private final AES128Config aes128Config;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public void checkEmailDuplicated(String email) {
         if(userRepository.existsByEmail(email)){
-            throw new CustomException(ErrorCode.EXIST_EMAIL);
+            throw new CustomException(ErrorCode.EXIST_EMAIL, Map.of("email", email), log::info);
         }
     }
 
     public void join(JoinInfoDTO dto) {
-        String password = dto.password();
+        String rawPassword = dto.password();
+        String encPassword = bCryptPasswordEncoder.encode(rawPassword);
         String confirmPassword = dto.confirmPassword();
+        String emailKey = dto.emailKey();
+        String email = aes128Config.decryptAes(emailKey);
+
         List<AgreedTermDTO> terms = dto.agreedTerms();
         List<SubTerm> agreedTerms = new ArrayList<>();
+        List<SubTerm> haveToAgreeTerms = termRepository.findByTermIdAndVersionWithJoin();
 
-        if(!password.equals(confirmPassword)){
-            throw new CustomException(ErrorCode.NOT_VALID_PASSWORD);
+        if(!rawPassword.equals(confirmPassword)){
+            throw new CustomException(ErrorCode.NOT_VALID_PASSWORD,
+                Map.of("password", rawPassword, "confirmPassword", confirmPassword),
+                log::info);
         }
-        // + 필수약관 전부 동의했나? term-subTerm 모두 가져오기
+
         for (AgreedTermDTO term : terms) {
             SubTerm findTerm = termRepository.findByTitleAndVersionWithJoin(term.title(), term.version())
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_TERM));
+                .orElseThrow(() ->
+                    new CustomException(ErrorCode.NOT_EXIST_TERM,
+                        Map.of("agreedTerms", agreedTerms), log::info));
 
             agreedTerms.add(findTerm);
         }
 
-        // + 이메일 키 확인 코드 추가하기
+        if(!agreedTerms.containsAll(haveToAgreeTerms)){
+            throw new CustomException(ErrorCode.NOT_ALL_AGREED_REQUIRED_TERMS,
+                Map.of("agreedTerms", agreedTerms, "haveToAgreeTerms", haveToAgreeTerms), log::info);
+        }
+
+        if(!emailService.existData(email)){
+            throw new CustomException(ErrorCode.DECRYPTION_FAILED, Map.of("emailKey", emailKey), log::info);
+        }
 
         // 해시
-        User savedUser = userRepository.save(dto.toUserEntity());
+        User savedUser = userRepository.save(dto.toUserEntity(email, encPassword));
         for (SubTerm agreedTerm : agreedTerms) {
             UserSubTermId userSubTermId = UserSubTermId.builder()
                 .userId(savedUser.getId())
