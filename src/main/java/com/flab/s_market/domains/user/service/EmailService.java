@@ -1,17 +1,14 @@
 package com.flab.s_market.domains.user.service;
 
-import com.flab.s_market.common.config.AES128Config;
+import com.flab.s_market.common.config.EncryptionService;
 import com.flab.s_market.common.exception.CustomException;
 import com.flab.s_market.common.exception.ErrorCode;
 import com.flab.s_market.domains.user.dto.request.EmailCodeDTO;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.Base64;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -31,7 +28,7 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 public class EmailService {
     private final JavaMailSender mailSender;
     private final StringRedisTemplate redisTemplate;
-    private final AES128Config aes128Config;
+    private final EncryptionService encryptionService;
     private Logger log = LoggerFactory.getLogger(EmailService.class);
 
     @Value("${spring.mail.username}")
@@ -70,16 +67,13 @@ public class EmailService {
 
 
     // 메일 반환
-    private MimeMessage createEmailForm(String email) throws MessagingException {
-
-        String authCode = createdCode();
+    private MimeMessage createEmailForm(String email, String authCode) throws MessagingException {
 
         MimeMessage message = mailSender.createMimeMessage();
         message.addRecipients(MimeMessage.RecipientType.TO, email);
         message.setSubject("S market 인증 코드");
         message.setFrom(configEmail);
         message.setText(setContext(authCode), "utf-8", "html");
-        setDataExpire(email, authCode, 60 * 30L);
 
         return message;
     }
@@ -87,14 +81,17 @@ public class EmailService {
 
     // 메일 보내기
     public void sendEmail(String toEmail){
-        if (existData(toEmail)) {
-            deleteData(toEmail);
+        if (existEmailData(toEmail)) {
+            throw new CustomException(ErrorCode.NOT_PASSED_FIVE_MINUTES, Map.of("email", toEmail), log::info);
         }
+
         try {
-            MimeMessage emailForm = createEmailForm(toEmail);
+            String authCode = createdCode();
+            MimeMessage emailForm = createEmailForm(toEmail, authCode);
+            setDataWithTTL(toEmail, authCode, 60 * 5L);
             mailSender.send(emailForm);
         }catch(Exception e){
-            throw new CustomException(ErrorCode.MAIL_SYSTEM_ERROR, Map.of("email", toEmail), log::warn);
+            throw new CustomException(ErrorCode.MAIL_SYSTEM_ERROR, Map.of("email", toEmail), log::warn, e); // i/o exception
         }
     }
 
@@ -102,45 +99,38 @@ public class EmailService {
     public String verifyEmailCode(EmailCodeDTO dto){
         String email = dto.email();
         String code = dto.code();
-        String codeFoundByEmail = getData(dto.email());
+        Optional<String> codeFoundByEmail = getEmailDataIfExist(dto.email());
         System.out.println(codeFoundByEmail);
-        if (codeFoundByEmail == null) {
+        if (!codeFoundByEmail.isPresent()) {
             throw new CustomException(ErrorCode.NOT_VALID_EMAIL_CODE,
                 Map.of("email", email, "emailCode", code), log::info);
         }
-        deleteData(email);
-        String emailKey = aes128Config.encryptAes(email);
-        setDataExpire(email, emailKey, 60*30L);
+        deleteEmailData(email);
+        String emailKey = encryptionService.encrypt(email); // 추상적인 이름 써라
+        setDataWithTTL(email, emailKey, 60*30L);
 
         log.info("enc = {}", emailKey);
 
         return emailKey;
     }
 
-    public String makeMemberId(String email) throws NoSuchAlgorithmException {
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
-        md.update(email.getBytes());
-        md.update(LocalDateTime.now().toString().getBytes());
-        byte[] digest = md.digest();
-        return Base64.getEncoder().encodeToString(digest);
-    }
-
-    public void setDataExpire(String key, String value, long duration) {
+    public void setDataWithTTL(String key, String value, long duration) {
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
         Duration expireDuration = Duration.ofSeconds(duration);
         valueOperations.set(key, value, expireDuration);
     }
 
-    public String getData(String key) {
+    public Optional<String> getEmailDataIfExist(String key) {
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-        return valueOperations.get(key);
+        return Optional.ofNullable(valueOperations.get(key));
     }
 
-    public boolean existData(String key) {
+    public boolean existEmailData(String key) {
         return Boolean.TRUE.equals(redisTemplate.hasKey(key));
     }
 
-    public void deleteData(String key) {
+    public void deleteEmailData(String key) { // TTL에 의해 사라졌다면 문제임, 없는 값 지울때 에러가 안나기도 하지만 확인해봐라
+        // 없다면 무시하면됨
         redisTemplate.delete(key);
     }
 }

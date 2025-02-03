@@ -8,7 +8,6 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
-import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,8 +21,9 @@ public class UserSubTerm extends BaseEntity {
     @EmbeddedId
     private UserSubTermId id;
 
+    // 동의한것만 저장? 안한것도 저장? 이건 기획자랑 얘기하면 됨
     @Column(nullable = false)
-    private LocalDateTime agreeDate;
+    private boolean agree;
 
     @MapsId("userId")
     @ManyToOne(fetch = FetchType.LAZY)

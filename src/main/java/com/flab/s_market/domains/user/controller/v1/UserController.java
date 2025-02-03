@@ -7,6 +7,7 @@ import com.flab.s_market.domains.user.dto.request.JoinInfoDTO;
 import com.flab.s_market.domains.user.service.EmailService;
 import com.flab.s_market.domains.user.service.UserService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -26,7 +27,7 @@ public class UserController {
     private final EmailService emailService;
 
     @GetMapping("/email/checkDuplicated")
-    public void getCheckEmailDuplicated(@RequestParam(value = "email") String email){
+    public void getCheckEmailDuplicated(@RequestParam(value = "email") @Email @Valid String email){
         userService.checkEmailDuplicated(email);
     }
 
@@ -36,7 +37,8 @@ public class UserController {
     }
     @PostMapping("/verifyCode")
     public ApiResponse<String> verifyCode(@RequestBody EmailCodeDTO dto){
-        return ApiResponse.createSuccess(emailService.verifyEmailCode(dto));
+        String responseData = emailService.verifyEmailCode(dto);
+        return ApiResponse.createSuccess(responseData);
     }
 
     @PostMapping("/join")
