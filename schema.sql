@@ -2,15 +2,15 @@
 
 CREATE TABLE `user` (
     `id`	BIGINT	NOT NULL auto_increment,
-    `email`	VARCHAR(50)	NOT NULL,
+    `email`	VARCHAR(100)	NOT NULL,
     `name`	VARCHAR(20)	NOT NULL,
-    `password`	VARCHAR(20)	NOT NULL,
+    `password`	VARCHAR(255)	NOT NULL,
     `created_at`	DATETIME	NOT NULL,
     `modified_at`	DATETIME	NOT NULL,
     primary key (id)
 );
 
-CREATE UNIQUE INDEX email ON user(`email`);
+CREATE UNIQUE INDEX idx_user_email ON user(`email`);
 
 # DROP TABLE IF EXISTS `term`;
 
@@ -60,7 +60,7 @@ CREATE TABLE `product` (
     `category_id`	BIGINT	NOT NULL,
     primary key (id)
 );
-CREATE INDEX category_id ON product(`category_id`);
+CREATE INDEX idx_product_category_id ON product(`category_id`);
 
 # DROP TABLE IF EXISTS `event`;
 
@@ -83,7 +83,7 @@ CREATE TABLE `cart` (
     `modified_at`	DATETIME	NOT NULL,
     primary key (id)
 );
-CREATE INDEX user_id ON cart(`user_id`);
+CREATE INDEX idx_cart_user_id ON cart(`user_id`);
 
 # DROP TABLE IF EXISTS `category`;
 
@@ -95,7 +95,7 @@ CREATE TABLE `category` (
     `modified_at`	DATETIME	NOT NULL,
     primary key (id)
 );
-CREATE INDEX parent_id on category(`parent_id`);
+CREATE INDEX idx_category_parent_id on category(`parent_id`);
 
 # DROP TABLE IF EXISTS `cart_product`;
 
@@ -108,8 +108,8 @@ CREATE TABLE `cart_product` (
     `modified_at`	DATETIME	NOT NULL,
     primary key (id)
 );
-CREATE INDEX cart_id on cart_product(`cart_id`);
-CREATE INDEX product_id on cart_product(`product_id`);
+CREATE INDEX idx_cart_product_cart_id on cart_product(`cart_id`);
+CREATE INDEX idx_cart_product_product_id on cart_product(`product_id`);
 
 # DROP TABLE IF EXISTS `orders`;
 
@@ -122,8 +122,8 @@ CREATE TABLE `orders` (
     `modified_at`	DATETIME	NOT NULL,
     primary key (id)
 );
-CREATE INDEX delivery_id on `orders`(`delivery_id`);
-CREATE INDEX cart_id on `orders`(`cart_id`);
+CREATE INDEX idx_orders_delivery_id on `orders`(`delivery_id`);
+CREATE INDEX idx_orders_cart_id on `orders`(`cart_id`);
 
 # DROP TABLE IF EXISTS `delivery`;
 
@@ -145,7 +145,7 @@ CREATE TABLE `event_product` (
     `modified_at`	DATETIME	NOT NULL,
     primary key (id)
 );
-CREATE INDEX product_id on `event_product`(`product_id`);
-CREATE INDEX event_id on `event_product`(`event_id`);
+CREATE INDEX idx_event_product_product_id on `event_product`(`product_id`);
+CREATE INDEX idx_event_product_event_id on `event_product`(`event_id`);
 
 commit;
