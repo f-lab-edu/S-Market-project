@@ -1,10 +1,10 @@
 package com.flab.s_market.domains.term.repository;
 
 import com.flab.s_market.domains.term.domain.QSubTerm;
-import com.flab.s_market.domains.term.dto.response.DetailTermDTO;
-import com.querydsl.core.types.Projections;
+import com.flab.s_market.domains.term.domain.SubTerm;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
+import java.util.Optional;
 
 public class SubTermCustomRepositoryImpl implements SubTermCustomRepository{
 
@@ -15,18 +15,20 @@ public class SubTermCustomRepositoryImpl implements SubTermCustomRepository{
     }
 
     @Override
-    public DetailTermDTO findByTermIdAndVersion(Long termId, Integer version) {
+    public Optional<SubTerm> findByTermIdAndVersion(Long termId, Integer version) {
         QSubTerm subTerm = QSubTerm.subTerm;
 
-        return queryFactory
-            .select(Projections.constructor(
-                DetailTermDTO.class,
-                subTerm.url,
-                subTerm.id.version,
-                subTerm.term.title
-            ))
+        SubTerm sub = queryFactory
+            .select(subTerm)
             .from(subTerm)
             .where(subTerm.id.termId.eq(termId), subTerm.id.version.eq(version))
             .fetchOne();
+
+        return Optional.ofNullable(sub);
+        /*if(sub == null){
+            return Optional.empty();
+        }else{
+            return Optional.of(sub);
+        }*/
     }
 }
