@@ -25,11 +25,11 @@ public class TermController {
     }
 
     @GetMapping("/terms/detail")
-    public ApiResponse<DetailTermDTO> getDetailTerms( // 1. termId==Null 이면 스프링에서 알수없는 에러 2. termId ==Nullable로해서 customException처리
-        // 상황에 따라 판단해서 1,2 선택해라
+    public ApiResponse<DetailTermDTO> getDetailTerms(
         @RequestParam(name = "termId") Long termId,
         @RequestParam(name = "version") Integer version
     ){
-        return ApiResponse.createSuccess(termService.getDetailTerms(termId, version));
+        DetailTermDTO responseDTO = termService.getDetailTerms(termId, version);
+        return ApiResponse.createSuccess(responseDTO);
     }
 }

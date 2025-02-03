@@ -14,7 +14,8 @@ public enum ErrorCode {
     MAIL_SYSTEM_ERROR("ACCOUNT-05", "이메일 시스템 에러가 발생했습니다. 발송 이메일을 다시 확인해주세요.", HttpStatus.INTERNAL_SERVER_ERROR),
     ENCRYPTION_FAILED("ACCOUNT-06", "이메일 암호화에 실패하였습니다. 다시 시도해주세요.", HttpStatus.INTERNAL_SERVER_ERROR),
     DECRYPTION_FAILED("ACCOUNT-07", "이메일키 복호화에 실패하였습니다. 다시 시도해주세요.", HttpStatus.INTERNAL_SERVER_ERROR),
-    NOT_ALL_AGREED_REQUIRED_TERMS("ACCOUNT-08", "필수 약관에 모두 동의해야합니다.", HttpStatus.BAD_REQUEST);
+    NOT_ALL_AGREED_REQUIRED_TERMS("ACCOUNT-08", "필수 약관에 모두 동의해야합니다.", HttpStatus.BAD_REQUEST),
+    NOT_PASSED_FIVE_MINUTES("ACCOUNT-09", "이메일에 인증코드를 발송한 지 5분이 지나지 않았습니다. 이메일을 확인해주세요.", HttpStatus.NOT_FOUND);
 
     private final String code;
     private final String message;

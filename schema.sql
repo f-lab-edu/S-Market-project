@@ -42,7 +42,7 @@ CREATE TABLE `user_sub_term` (
     `user_id`	BIGINT	NOT NULL,
     `term_id`	BIGINT	NOT NULL,
     `version`	INTEGER	NOT NULL COMMENT '약관 버전',
-    `agree_date`	DATETIME	NOT NULL COMMENT'동의한 날짜',
+    `agree`	BIT	NOT NULL COMMENT '동의 여부',
     `created_at`	DATETIME	NOT NULL,
     `modified_at`	DATETIME	NOT NULL,
     primary key (user_id, term_id, version)
