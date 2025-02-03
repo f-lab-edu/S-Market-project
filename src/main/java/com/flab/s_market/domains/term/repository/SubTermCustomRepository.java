@@ -1,7 +1,8 @@
 package com.flab.s_market.domains.term.repository;
 
-import com.flab.s_market.domains.term.dto.response.DetailTermDTO;
+import com.flab.s_market.domains.term.domain.SubTerm;
+import java.util.Optional;
 
 public interface SubTermCustomRepository {
-    public DetailTermDTO findByTermIdAndVersion(Long termId, Integer version);
+    Optional<SubTerm> findByTermIdAndVersion(Long termId, Integer version);
 }

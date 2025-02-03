@@ -2,6 +2,7 @@ package com.flab.s_market.domains.term.service;
 
 import com.flab.s_market.common.exception.CustomException;
 import com.flab.s_market.common.exception.ErrorCode;
+import com.flab.s_market.domains.term.domain.SubTerm;
 import com.flab.s_market.domains.term.domain.Term;
 import com.flab.s_market.domains.term.dto.response.AllTermResponseDTO;
 import com.flab.s_market.domains.term.dto.response.DetailTermDTO;
@@ -48,8 +49,10 @@ public class TermService {
     }
 
     public DetailTermDTO getDetailTerms(Long termId, Integer version) {
-        return subTermRepository.findByTermIdAndVersion(termId, version)
+        SubTerm subTerm = subTermRepository.findByTermIdAndVersion(termId, version)
             .orElseThrow(() ->
                 new CustomException(ErrorCode.NOT_EXIST_TERM, Map.of("termId", termId, "version", version), log::info));
+
+        return DetailTermDTO.from(subTerm);
     }
 }

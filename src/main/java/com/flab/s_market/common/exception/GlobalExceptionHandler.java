@@ -39,7 +39,7 @@ public class GlobalExceptionHandler {
     @Order(99)
     @ExceptionHandler(value={Exception.class}) // 모든 예외에 대해 처리함
     public ResponseEntity<ApiResponse<?>> handleException(Exception e){
-        log.debug("Exception occured : " + Arrays.toString(e.getStackTrace()));
+        log.error("Exception occured : " + Arrays.toString(e.getStackTrace()));
         // 모든 예외에 대해 처리할때 httpStatus는 어떤걸로 지정해야할지 모르겠음
         return new ResponseEntity<>(ApiResponse.createFail(e), HttpStatus.BAD_REQUEST);
     }
