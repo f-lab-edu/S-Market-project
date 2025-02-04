@@ -100,13 +100,12 @@ public class EmailService {
         String email = dto.email();
         String code = dto.code();
         Optional<String> codeFoundByEmail = getEmailDataIfExist(dto.email());
-        System.out.println(codeFoundByEmail);
-        if (!codeFoundByEmail.isPresent()) {
+        if (codeFoundByEmail.isEmpty()) {
             throw new CustomException(ErrorCode.NOT_VALID_EMAIL_CODE,
                 Map.of("email", email, "emailCode", code), log::info);
         }
         deleteEmailData(email);
-        String emailKey = encryptionService.encrypt(email); // 추상적인 이름 써라
+        String emailKey = encryptionService.encrypt(email);
         setDataWithTTL(email, emailKey, 60*30L);
 
         log.info("enc = {}", emailKey);
@@ -129,8 +128,10 @@ public class EmailService {
         return Boolean.TRUE.equals(redisTemplate.hasKey(key));
     }
 
-    public void deleteEmailData(String key) { // TTL에 의해 사라졌다면 문제임, 없는 값 지울때 에러가 안나기도 하지만 확인해봐라
-        // 없다면 무시하면됨
-        redisTemplate.delete(key);
+    public void deleteEmailData(String key) {
+        Optional<String> emailDataIfExist = getEmailDataIfExist(key);
+        if(emailDataIfExist.isPresent()){
+            redisTemplate.delete(key);
+        }
     }
 }
