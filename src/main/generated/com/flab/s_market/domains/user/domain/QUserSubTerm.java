@@ -24,7 +24,7 @@ public class QUserSubTerm extends EntityPathBase<UserSubTerm> {
 
     public final com.flab.s_market.common.entity.QBaseEntity _super = new com.flab.s_market.common.entity.QBaseEntity(this);
 
-    public final DateTimePath<java.time.LocalDateTime> agreeDate = createDateTime("agreeDate", java.time.LocalDateTime.class);
+    public final BooleanPath agree = createBoolean("agree");
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
