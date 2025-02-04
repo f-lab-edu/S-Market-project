@@ -1,10 +1,6 @@
 package com.flab.s_market;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import com.flab.s_market.common.config.AES128Config;
+import com.flab.s_market.common.config.EncryptionService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,15 +16,15 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 public class EmailTest {
 
     @Autowired
-    private AES128Config aes128Config;
+    private EncryptionService encryptionService;
     private Logger log = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     @Test
     @DisplayName("Aes128 암호화가 잘 되는지 확인 테스트")
     public void aes128Test(){
         String text = "this is test";
-        String enc = aes128Config.encryptAes(text);
-        String dec = aes128Config.decryptAes(enc);
+        String enc = encryptionService.encrypt(text);
+        String dec = encryptionService.decrypt(enc);
         log.info("enc = {}", enc);
         log.info("dec = {}", dec);
     }

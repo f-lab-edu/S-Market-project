@@ -21,18 +21,12 @@ public class ApiResponse <T>{
     public static <T> ApiResponse<T> createSuccess(final T data){
         return new ApiResponse<>(SUCCESS_CODE, data);
     }
-    public static ApiResponse<?> createSuccessWithNoContent(){
-        return new ApiResponse<>(SUCCESS_CODE, null);
-    }
+
     public static ApiResponse<?> createFail(final CustomException e){
         return new ApiResponse<>(e.getErrorCode().getCode(), e.getMessage());
     }
 
-    public static ApiResponse<?> createFail(final Exception e){
-        return new ApiResponse<>(VALID_FAIL_CODE, e.getMessage());
-    }
-
-    public static ApiResponse<?> createFailWithBindingResult(final String errorMessage){
+    public static ApiResponse<?> createFailWithErrorMessage(final String errorMessage){
         return new ApiResponse<>(VALID_FAIL_CODE, errorMessage);
     }
 }

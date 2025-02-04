@@ -9,18 +9,22 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Map;
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AES128Config {
+public class EncryptionService {
     private static final Charset ENCODING_TYPE = StandardCharsets.UTF_8;
     private static final String INSTANCE_TYPE = "AES/CBC/PKCS5Padding";
     private static final int AES_KEY_SIZE = 16;
+    private Logger log = LoggerFactory.getLogger(EncryptionService.class);
 
     @Value("${aes.secret-key}")
     private String secretKey;
@@ -43,24 +47,24 @@ public class AES128Config {
     }
 
     // AES 암호화
-    public String encryptAes(String plaintext){
+    public String encrypt(String plaintext){
         try {
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
             byte[] encryted = cipher.doFinal(plaintext.getBytes(ENCODING_TYPE)); // 데이터 암호화
             return new String(Base64.getEncoder().encode(encryted), ENCODING_TYPE); // 문자열 인코딩 반환
         } catch (Exception e) {
-            throw new CustomException(ErrorCode.ENCRYPTION_FAILED);
+            throw new CustomException(ErrorCode.ENCRYPTION_FAILED, Map.of("plainText", plaintext), log::warn);
         }
     }
 
     // AES 복호화
-    public String decryptAes(String plaintext) {
+    public String decrypt(String encryptedText) {
         try {
             cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
-            byte[] decoded = Base64.getDecoder().decode(plaintext.getBytes(ENCODING_TYPE));
+            byte[] decoded = Base64.getDecoder().decode(encryptedText.getBytes(ENCODING_TYPE));
             return new String(cipher.doFinal(decoded), ENCODING_TYPE); // 데이터 복호화, 인코딩 반환
         } catch (Exception e) {
-            throw new CustomException(ErrorCode.DECRYPTION_FAILED);
+            throw new CustomException(ErrorCode.DECRYPTION_FAILED, Map.of("encryptedText", encryptedText), log::warn);
         }
     }
 }
