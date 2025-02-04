@@ -64,7 +64,7 @@ public class EncryptionService {
             byte[] decoded = Base64.getDecoder().decode(encryptedText.getBytes(ENCODING_TYPE));
             return new String(cipher.doFinal(decoded), ENCODING_TYPE); // 데이터 복호화, 인코딩 반환
         } catch (Exception e) {
-            throw new CustomException(ErrorCode.DECRYPTION_FAILED, Map.of("encryptedText", encryptedText), log::warn);
+            throw new CustomException(ErrorCode.DECRYPTION_FAILED, Map.of("encryptedText", encryptedText), log::info);
         }
     }
 }

@@ -4,7 +4,6 @@ import com.flab.s_market.domains.user.domain.User;
 import com.flab.s_market.domains.user.domain.UserSubTerm;
 import com.flab.s_market.domains.user.domain.UserSubTermId;
 import jakarta.validation.constraints.NotBlank;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public record JoinInfoDTO (
@@ -21,7 +20,7 @@ public record JoinInfoDTO (
     public User toUserEntity(String email, String encPassword) {
         return new User(email, userName, encPassword);
     }
-    public UserSubTerm toUserSubTermEntity(UserSubTermId id, LocalDateTime agreeDate, User user){
-        return new UserSubTerm(id, agreeDate, user);
+    public UserSubTerm toUserSubTermEntity(UserSubTermId id, boolean agree, User user){
+        return new UserSubTerm(id, agree, user);
     }
 }
