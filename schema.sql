@@ -1,6 +1,6 @@
-# DROP TABLE IF EXISTS `user`;
+# DROP TABLE IF EXISTS `member`;
 
-CREATE TABLE `user` (
+CREATE TABLE `member` (
     `id`	BIGINT	NOT NULL auto_increment,
     `email`	VARCHAR(100)	NOT NULL,
     `name`	VARCHAR(20)	NOT NULL,
@@ -10,7 +10,13 @@ CREATE TABLE `user` (
     primary key (id)
 );
 
-CREATE UNIQUE INDEX idx_user_email ON user(`email`);
+CREATE UNIQUE INDEX idx_user_email ON member(`email`);
+
+CREATE TABLE `member_roles`(
+    `member_id` BIGINT NOT NULL,
+    `roles` VARCHAR(10) NOT NULL,
+    primary key (member_id, roles)
+);
 
 # DROP TABLE IF EXISTS `term`;
 
@@ -38,14 +44,14 @@ CREATE TABLE `sub_term` (
 
 # DROP TABLE IF EXISTS `user_sub_term`;
 
-CREATE TABLE `user_sub_term` (
-    `user_id`	BIGINT	NOT NULL,
+CREATE TABLE `member_sub_term` (
+    `member_id`	BIGINT	NOT NULL,
     `term_id`	BIGINT	NOT NULL,
     `version`	INTEGER	NOT NULL COMMENT '약관 버전',
     `agree`	BIT	NOT NULL COMMENT '동의 여부',
     `created_at`	DATETIME	NOT NULL,
     `modified_at`	DATETIME	NOT NULL,
-    primary key (user_id, term_id, version)
+    primary key (member_id, term_id, version)
 );
 
 # DROP TABLE IF EXISTS `product`;
