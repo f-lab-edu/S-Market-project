@@ -32,7 +32,7 @@ public class QShopping extends EntityPathBase<Cart> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> modifiedAt = _super.modifiedAt;
 
-    public final com.flab.s_market.domains.user.domain.QUser user;
+    public final com.flab.s_market.domains.member.domain.QUser user;
 
     public QShopping(String variable) {
         this(Cart.class, forVariable(variable), INITS);
@@ -52,7 +52,7 @@ public class QShopping extends EntityPathBase<Cart> {
 
     public QShopping(Class<? extends Cart> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.user = inits.isInitialized("user") ? new com.flab.s_market.domains.user.domain.QUser(forProperty("user")) : null;
+        this.user = inits.isInitialized("user") ? new com.flab.s_market.domains.member.domain.QUser(forProperty("user")) : null;
     }
 
 }

@@ -17,7 +17,10 @@ public enum ErrorCode {
     NOT_ALL_AGREED_REQUIRED_TERMS("ACCOUNT-08", "필수 약관에 모두 동의해야합니다.", HttpStatus.BAD_REQUEST),
     NOT_PASSED_FIVE_MINUTES("ACCOUNT-09", "이메일에 인증코드를 발송한 지 5분이 지나지 않았습니다. 이메일을 확인해주세요.", HttpStatus.NOT_FOUND),
     NOT_EXIST_TERM("ACCOUNT-10", "존재하지 않는 약관 이름 또는 약관 버전입니다. 약관 이름 또는 약관 버전을 확인해주세요.", HttpStatus.NOT_FOUND),
-    EXIST_USER("ACCOUNT-11", "이미 해당 계정은 회원가입되어있습니다. 이메일을 다시 확인해주세요.", HttpStatus.BAD_REQUEST);
+    EXIST_USER("ACCOUNT-11", "이미 해당 계정은 회원가입되어있습니다. 이메일을 다시 확인해주세요.", HttpStatus.BAD_REQUEST),
+    INVALID_TOKEN("ACCOUNT-12", "잘못된 토큰을 전송하였습니다. 토큰 정보를 다시 확인해주세요.", HttpStatus.BAD_REQUEST),
+    EXPIRED_TOKEN("ACCOUNT-13", "토큰이 만료되었습니다. 새로운 토큰을 발급받아주세요.", HttpStatus.BAD_REQUEST);
+
 
     private final String code;
     private final String message;

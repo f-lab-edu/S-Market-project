@@ -1,7 +1,7 @@
 package com.flab.s_market.domains.cart.domain;
 
 import com.flab.s_market.common.entity.BaseEntity;
-import com.flab.s_market.domains.user.domain.User;
+import com.flab.s_market.domains.member.domain.Member;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -24,5 +24,5 @@ public class Cart extends BaseEntity {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private User user;
+    private Member member;
 }
