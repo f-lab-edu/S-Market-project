@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final MemberRepository memberRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
 
     // username 존재여부 검증
     @Override
@@ -29,7 +28,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     private UserDetails createUserDetails(Member member) {
         return User.builder()
             .username(member.getEmail())
-            .password(passwordEncoder.encode(member.getPassword()))
+            .password(member.getPassword())
             .authorities(member.getAuthorities())
             .build();
     }
