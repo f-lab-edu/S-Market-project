@@ -5,23 +5,26 @@ import com.flab.s_market.common.exception.CustomException;
 import com.flab.s_market.common.exception.ErrorCode;
 import com.flab.s_market.domains.member.domain.Member;
 import com.flab.s_market.domains.member.domain.MemberSubTermId;
+import com.flab.s_market.domains.member.dto.request.AgreedTermDTO;
+import com.flab.s_market.domains.member.dto.request.JoinInfoDTO;
 import com.flab.s_market.domains.member.dto.request.LoginRequestDTO;
-import com.flab.s_market.domains.security.service.JwtTokenProvider;
+import com.flab.s_market.domains.member.repository.MemberRepository;
+import com.flab.s_market.domains.member.repository.MemberSubTermRepository;
+import com.flab.s_market.domains.security.dto.request.JwtTokenReissueRequestDTO;
 import com.flab.s_market.domains.security.dto.response.JwtTokenResponseDTO;
+import com.flab.s_market.domains.security.service.JwtTokenProvider;
 import com.flab.s_market.domains.term.domain.SubTerm;
 import com.flab.s_market.domains.term.domain.Term;
 import com.flab.s_market.domains.term.repository.TermRepository;
-import com.flab.s_market.domains.member.dto.request.AgreedTermDTO;
-import com.flab.s_market.domains.member.dto.request.JoinInfoDTO;
-import com.flab.s_market.domains.member.repository.MemberRepository;
-import com.flab.s_market.domains.member.repository.MemberSubTermRepository;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -42,6 +45,10 @@ public class MemberService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final RedisTemplate redisTemplate;
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = 30*60*1000L; // 30분
+    private static final long REFRESH_TOKEN_EXPIRE_TIME = 7*24*60*60*1000L; // 7일
+    private static final String TOKEN_GRANT_TYPE = "Bearer";
 
     public void checkEmailDuplicated(String email) {
         if(userRepository.existsByEmail(email)){
@@ -75,6 +82,9 @@ public class MemberService {
         List<SubTerm> allTermsInDB = termRepository.findByTermIdAndVersionWithJoin();
 
         Member savedMember = userRepository.save(dto.toUserEntity(email, encPassword));
+        // stream 써서 required인 것과 아닌걸 나눠서 list만들어서 dataset을 만들어서 쓰면 이렇게 깊어지진 않음
+        // +++++ 중복되는건 메서드로 빼고 중간 결과를 list, set으로 만들게 되면 if 없어짐
+        // chatgpt plugin 써봐라
         for (SubTerm subTerm : allTermsInDB) {
             Term term = subTerm.getTerm();
             if(term.getIsRequired()){
@@ -128,8 +138,49 @@ public class MemberService {
         // authenticated값이 true
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
-        // 3. 인증 정보를 기반으로 JWT 토큰 생성
-        JwtTokenResponseDTO jwtToken = jwtTokenProvider.generateToken(authentication);
+        // 3. accessToken이 발급목록에 있는지 확인
+        if(Boolean.TRUE.equals(redisTemplate.hasKey("AT:" + email))){
+            throw new CustomException(ErrorCode.ALREADY_LOGIN, Map.of("dto", dto), log::info);
+        }
+
+        // 4. 인증 정보를 기반으로 JWT 토큰 생성
+        String accessToken = jwtTokenProvider.generateAccessToken(authentication);
+        String refreshToken = jwtTokenProvider.generateRefreshToken();
+        JwtTokenResponseDTO jwtToken = new JwtTokenResponseDTO(TOKEN_GRANT_TYPE, accessToken, refreshToken, ACCESS_TOKEN_EXPIRE_TIME, REFRESH_TOKEN_EXPIRE_TIME);
+
+        // 5. RefreshToken Redis 저장 (expirationTime 설정을 통해 자동 삭제 처리) + accesstoken이 발급한 목록이 있는지 확인
+        redisTemplate.opsForValue()
+                .set("AT:" + email, jwtToken.accessToken(), jwtToken.accessTokenExpirationTime(), TimeUnit.MILLISECONDS);
+        redisTemplate.opsForValue()
+            .set("RT:" + email, jwtToken.refreshToken(), jwtToken.refreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
+
+        return jwtToken;
+    }
+
+    public JwtTokenResponseDTO reissueToken(JwtTokenReissueRequestDTO dto) {
+
+        // 1. Refresh Token 검증
+        jwtTokenProvider.validateToken(dto.refreshToken());
+
+        // 2. Refresh Token 에서 User email 를 가져옵니다.
+        Authentication authentication = jwtTokenProvider.getAuthentication(dto.accessToken());
+
+        // 3. Redis 에서 User email 을 기반으로 저장된 Refresh Token 값을 가져옵니다.
+        String refreshToken = (String)redisTemplate.opsForValue().get("RT:" + authentication.getName());
+        assert refreshToken != null;
+        if(!refreshToken.equals(dto.refreshToken())) {
+            throw new CustomException(ErrorCode.NOT_EQUAL_REFRESH_TOKEN, Map.of("refreshToken", refreshToken), log::info);
+        }
+
+        // 4. 새로운 토큰 생성
+        String accessToken = jwtTokenProvider.generateAccessToken(authentication);
+        JwtTokenResponseDTO jwtToken = new JwtTokenResponseDTO(
+            TOKEN_GRANT_TYPE, accessToken, refreshToken, ACCESS_TOKEN_EXPIRE_TIME, redisTemplate.getExpire("RT:"+authentication.getName())
+        );
+
+        // 5. RefreshToken Redis 업데이트
+        redisTemplate.opsForValue()
+            .set("AT:" + authentication.getName(), jwtToken.accessToken(), jwtToken.accessTokenExpirationTime(), TimeUnit.MILLISECONDS);
 
         return jwtToken;
     }
