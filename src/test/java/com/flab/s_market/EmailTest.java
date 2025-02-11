@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -18,6 +19,8 @@ public class EmailTest {
     @Autowired
     private EncryptionService encryptionService;
     private Logger log = LoggerFactory.getLogger(this.getClass().getSimpleName());
+    @Autowired
+    private BCryptPasswordEncoder encoder;
 
     @Test
     @DisplayName("Aes128 암호화가 잘 되는지 확인 테스트")
@@ -27,5 +30,13 @@ public class EmailTest {
         String dec = encryptionService.decrypt(enc);
         log.info("enc = {}", enc);
         log.info("dec = {}", dec);
+    }
+
+    @Test
+    public void bcryptPasswordEncoder(){
+        String password = "songhee12!";
+        String encPassword = encoder.encode(password);
+        boolean isMatch = encoder.matches(password, encPassword);
+        log.info("isMatch = {}", isMatch);
     }
 }

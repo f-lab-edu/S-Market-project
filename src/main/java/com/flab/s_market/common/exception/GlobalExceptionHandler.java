@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     private Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    // error response를 정확히 어떻게 바꿔야할지 고민중
     @Order(1)
     @ExceptionHandler(value={CustomException.class})
     public ResponseEntity<ApiResponse<?>> handleCustomException(CustomException e){
@@ -33,8 +34,7 @@ public class GlobalExceptionHandler {
         String errorMessage = ExceptionUtils.getFullStackTrace(e);
         log.error("ConstraintViolationException occured : getFullStackTrace - " + errorMessage);
 
-        return new ResponseEntity<>(ApiResponse.createFailWithErrorMessage(errorMessage),
-            HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(ApiResponse.createFailWithErrorMessage(errorMessage), HttpStatus.BAD_REQUEST);
     }
 
     @Order(3)
@@ -51,7 +51,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<?>> handleException(Exception e){
         String errorMessage = ExceptionUtils.getFullStackTrace(e);
         log.error("Exception occured : getFullStackTrace - " + errorMessage);
-        // 모든 예외에 대해 처리할때 httpStatus는 어떤걸로 지정해야할지 모르겠음
-        return new ResponseEntity<>(ApiResponse.createFailWithErrorMessage(errorMessage), HttpStatus.BAD_REQUEST);
+        // external error 어떻게 활용..??
+         // 9999
+        return new ResponseEntity<>(ApiResponse.createFailWithErrorMessage(errorMessage), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

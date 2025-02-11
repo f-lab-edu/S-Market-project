@@ -2,7 +2,6 @@ package com.flab.s_market.domains.security.service;
 
 import com.flab.s_market.common.exception.CustomException;
 import com.flab.s_market.common.exception.ErrorCode;
-import com.flab.s_market.domains.security.dto.response.JwtTokenResponseDTO;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -33,7 +32,6 @@ import org.springframework.stereotype.Component;
 public class JwtTokenProvider {
     // JWT 서명을 위한 KEY 객체
     private final Key key;
-    private static final String TOKEN_GRANT_TYPE = "Bearer";
     private static final String HEADER_ALGORITHM = "HS256";
     private static final String HEADER_TYPE = "JWT";
     private static final String AUTHORITIES_KEY = "auth";
@@ -50,19 +48,21 @@ public class JwtTokenProvider {
     }
 
     // Member 정보를 가지고 AccessToken, RefreshToken을 생성하는 메서드
-    public JwtTokenResponseDTO generateToken(Authentication authentication) {
+
+    public String generateAccessToken(Authentication authentication){
         // 권한 가져오기
         String authorities = authentication.getAuthorities().stream()
             .map(GrantedAuthority::getAuthority)
             .collect(Collectors.joining(","));
 
-        // 현재 시간 가져오기
-        long now = (new Date()).getTime();
         // 토큰 발급 시간
         Date issueAt = new Date();
 
+        // 현재 시간 가져오기
+        long now = (new Date()).getTime();
+
         // access token 생성
-        String accessToken = Jwts.builder()
+        return Jwts.builder()
             .setHeader(createHeaders())
             .setSubject(authentication.getName()) // 토큰 주제 설정
             .claim(AUTHORITIES_KEY, authorities) // 사용자 권한 설정
@@ -70,15 +70,17 @@ public class JwtTokenProvider {
             .setIssuedAt(issueAt)
             .signWith(key, SignatureAlgorithm.HS256) // 서명 알고리즘 생성
             .compact();
+    }
 
-        // Refresh Token 생성
-        String refreshToken = Jwts.builder()
+    public String generateRefreshToken(){
+        // 현재 시간 가져오기
+        long now = (new Date()).getTime();
+
+        return Jwts.builder()
             .setHeader(createHeaders())
             .setExpiration(new Date(now + REFRESH_TOKEN_EXPIRE_TIME)) // 토큰 만료시간 설정(일주일)
             .signWith(key, SignatureAlgorithm.HS256) // 서명 알고리즘 생성
             .compact();
-
-        return new JwtTokenResponseDTO(TOKEN_GRANT_TYPE, accessToken, refreshToken);
     }
 
     private static Map<String, Object> createHeaders(){
@@ -92,9 +94,9 @@ public class JwtTokenProvider {
     }
 
     // Jwt 토큰을 복호화하여 토큰에 들어있는 정보를 꺼내, Authentication 객체를 생성하는 메서드
-    public Authentication getAuthentication(String accessToken) {
+    public Authentication getAuthentication(String token) {
         // Jwt 토큰 복호화
-        Claims claims = parseClaims(accessToken);
+        Claims claims = parseClaims(token);
 
         if (claims.get(AUTHORITIES_KEY) == null) {
             throw new RuntimeException("권한 정보가 없는 토큰입니다.");
