@@ -68,9 +68,10 @@ public class MemberService {
             throw new CustomException(ErrorCode.EXIST_USER, Map.of("email", email), log::info);
         }
 
-        if(!emailService.existEmailData(email)){
+        if(!emailService.existEmailData("VE:"+email)){
             throw new CustomException(ErrorCode.DECRYPTION_FAILED, Map.of("emailKey", emailKey), log::info);
         }
+        emailService.deleteEmailData("VE:"+email);
 
         if(!ObjectUtils.equals(rawPassword, confirmPassword)){ // NULL?
             throw new CustomException(ErrorCode.NOT_VALID_PASSWORD,
@@ -83,37 +84,38 @@ public class MemberService {
         List<SubTerm> allTermsInDB = termRepository.findByTermIdAndVersionWithJoin();
 
         Member savedMember = userRepository.save(dto.toUserEntity(email, encPassword));
-        // stream 써서 required인 것과 아닌걸 나눠서 list만들어서 dataset을 만들어서 쓰면 이렇게 깊어지진 않음
-        // +++++ 중복되는건 메서드로 빼고 중간 결과를 list, set으로 만들게 되면 if 없어짐
-        // chatgpt plugin 써봐라
+
+        validateRequiredTerms(agreedTermsMap, allTermsInDB, agreedTermsDTO);
+        allTermsInDB.forEach(subTerm -> processSubTerm(savedMember, dto, agreedTermsMap, subTerm));
+
+    }
+
+    private void validateRequiredTerms(Map<String, Integer> agreedTermsMap, List<SubTerm> allTermsInDB,
+        List<AgreedTermDTO> agreedTermsDTO
+        ) {
         for (SubTerm subTerm : allTermsInDB) {
             Term term = subTerm.getTerm();
-            if(term.getIsRequired()){
-                if(!agreedTermsMap.containsKey(term.getTitle())){
-                    throw new CustomException(ErrorCode.NOT_ALL_AGREED_REQUIRED_TERMS,
-                        Map.of("agreedTermsDTO", agreedTermsDTO, "allTermsInDB", allTermsInDB), log::info);
-                }else{
-                    if(agreedTermsMap.get(term.getTitle()).equals(subTerm.getId().getVersion())){
-                        saveUserSubTerm(savedMember, dto, true, subTerm);
-                    }else{
-                        throw new CustomException(ErrorCode.NOT_MATCH_TERM_VERSION,
-                            Map.of("agreedSubTerm", subTerm, "version", agreedTermsMap.get(term.getTitle())), log::info);
-                    }
-                }
-            }else{
-                if(!agreedTermsMap.containsKey(term.getTitle())){
-                    saveUserSubTerm(savedMember, dto, false, subTerm);
-                }else{
-                    if(agreedTermsMap.get(term.getTitle()).equals(subTerm.getId().getVersion())){
-                        saveUserSubTerm(savedMember, dto, false, subTerm);
-                    }else{
-                        throw new CustomException(ErrorCode.NOT_MATCH_TERM_VERSION,
-                            Map.of("agreedSubTerm", subTerm, "version", agreedTermsMap.get(term.getTitle())), log::info);
-                    }
-                }
+            if(term.getIsRequired() && !agreedTermsMap.containsKey(term.getTitle())){
+                throw new CustomException(ErrorCode.NOT_ALL_AGREED_REQUIRED_TERMS,
+                    Map.of("agreedTermsDTO", agreedTermsDTO, "allTermsInDB", allTermsInDB), log::info);
             }
         }
+    }
 
+    private void processSubTerm(Member savedMember, JoinInfoDTO dto, Map<String, Integer> agreedTermsMap, SubTerm subTerm) {
+        Term term = subTerm.getTerm();
+        Integer termVersion = agreedTermsMap.get(term.getTitle());
+
+        if(!agreedTermsMap.containsKey(term.getTitle())){
+            saveUserSubTerm(savedMember, dto, false, subTerm);
+        }else{
+            if(!ObjectUtils.equals(subTerm.getId().getVersion(), termVersion)){
+                throw new CustomException(ErrorCode.NOT_MATCH_TERM_VERSION,
+                    Map.of("agreedSubTerm", subTerm, "version", agreedTermsMap.get(term.getTitle())), log::info);
+            }
+
+            saveUserSubTerm(savedMember, dto, true, subTerm);
+        }
     }
 
     private void saveUserSubTerm(Member member, JoinInfoDTO dto, boolean agree, SubTerm subTerm) {
