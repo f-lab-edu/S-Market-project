@@ -21,7 +21,8 @@ public enum ErrorCode {
     INVALID_TOKEN("ACCOUNT-12", "잘못된 토큰을 전송하였습니다. 토큰 정보를 다시 확인해주세요.", "", HttpStatus.BAD_REQUEST),
     EXPIRED_TOKEN("ACCOUNT-13", "토큰이 만료되었습니다. 새로운 토큰을 발급받아주세요.", "", HttpStatus.BAD_REQUEST),
     ALREADY_LOGIN("ACCOUNT-14", "이미 로그인이 한 상태입니다. 로그인한 페이지로 돌아가주세요.", "", HttpStatus.NOT_FOUND),
-    NOT_EQUAL_REFRESH_TOKEN("ACCOUNT-15", "리프레시 토큰 정보가 일치하지 않습니다. 토큰 정보를 다시 확인해주세요", "", HttpStatus.BAD_REQUEST);
+    NOT_EQUAL_REFRESH_TOKEN("ACCOUNT-15", "리프레시 토큰 정보가 일치하지 않습니다. 토큰 정보를 다시 확인해주세요", "", HttpStatus.BAD_REQUEST),
+    VERIFY_CODE("ACCOUNT-16", "이미 인증코드가 전송되었습니다. 인증코드를 작성해주세요.", "", HttpStatus.NOT_FOUND);
 
 
     private final String code;
