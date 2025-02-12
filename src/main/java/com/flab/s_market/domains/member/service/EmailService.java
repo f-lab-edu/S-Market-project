@@ -81,14 +81,17 @@ public class EmailService {
 
     // 메일 보내기
     public void sendEmail(String toEmail){
-        if (existEmailData(toEmail)) {
+        if (existEmailData("SE"+toEmail)) {
             throw new CustomException(ErrorCode.NOT_PASSED_FIVE_MINUTES, Map.of("email", toEmail), log::info);
+        }
+        if(existEmailData("VE"+toEmail)){
+            throw new CustomException(ErrorCode.VERIFY_CODE, Map.of("email", toEmail), log::info);
         }
 
         try {
             String authCode = createdCode();
             MimeMessage emailForm = createEmailForm(toEmail, authCode);
-            setDataWithTTL(toEmail, authCode, 60 * 5L);
+            setDataWithTTL("SE:"+toEmail, authCode, 60 * 5L);
             mailSender.send(emailForm);
         }catch(Exception e){
             throw new CustomException(ErrorCode.MAIL_SYSTEM_ERROR, Map.of("email", toEmail), log::warn, e); // i/o exception
@@ -99,14 +102,14 @@ public class EmailService {
     public String verifyEmailCode(EmailCodeDTO dto){
         String email = dto.email();
         String code = dto.code();
-        Optional<String> codeFoundByEmail = getEmailDataIfExist(dto.email());
+        Optional<String> codeFoundByEmail = getEmailDataIfExist("SE:"+dto.email());
         if (codeFoundByEmail.isEmpty()) {
             throw new CustomException(ErrorCode.NOT_VALID_EMAIL_CODE,
                 Map.of("email", email, "emailCode", code), log::info);
         }
-        deleteEmailData(email);
+        deleteEmailData("SE"+email);
         String emailKey = encryptionService.encrypt(email);
-        setDataWithTTL(email, emailKey, 60*30L);
+        setDataWithTTL("VE:"+email, emailKey, 60*30L);
 
         log.info("enc = {}", emailKey);
 
