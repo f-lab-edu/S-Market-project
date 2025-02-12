@@ -10,6 +10,7 @@ import com.flab.s_market.domains.member.dto.request.JoinInfoDTO;
 import com.flab.s_market.domains.member.dto.request.LoginRequestDTO;
 import com.flab.s_market.domains.member.repository.MemberRepository;
 import com.flab.s_market.domains.member.repository.MemberSubTermRepository;
+import com.flab.s_market.domains.security.dto.request.JwtTokenLogoutRequestDTO;
 import com.flab.s_market.domains.security.dto.request.JwtTokenReissueRequestDTO;
 import com.flab.s_market.domains.security.dto.response.JwtTokenResponseDTO;
 import com.flab.s_market.domains.security.service.JwtTokenProvider;
@@ -166,10 +167,14 @@ public class MemberService {
         Authentication authentication = jwtTokenProvider.getAuthentication(dto.accessToken());
 
         // 3. Redis 에서 User email 을 기반으로 저장된 Refresh Token 값을 가져옵니다.
-        String refreshToken = (String)redisTemplate.opsForValue().get("RT:" + authentication.getName());
-        assert refreshToken != null;
-        if(!refreshToken.equals(dto.refreshToken())) {
-            throw new CustomException(ErrorCode.NOT_EQUAL_REFRESH_TOKEN, Map.of("refreshToken", refreshToken), log::info);
+        String refreshToken = "";
+        if(redisTemplate.hasKey("RT:" + authentication.getName())){
+            refreshToken = (String)redisTemplate.opsForValue().get("RT:" + authentication.getName());
+            if(!refreshToken.equals(dto.refreshToken())) {
+                throw new CustomException(ErrorCode.NOT_EQUAL_REFRESH_TOKEN, Map.of("refreshToken", refreshToken, "dto.refreshToken", dto.refreshToken()), log::info);
+            }
+        }else{
+            throw new CustomException(ErrorCode.EXPIRED_TOKEN, Map.of("refreshToken", refreshToken), log::info);
         }
 
         // 4. 새로운 토큰 생성
@@ -185,4 +190,15 @@ public class MemberService {
         return jwtToken;
     }
 
+    public void logout(JwtTokenLogoutRequestDTO dto) {
+        jwtTokenProvider.validateToken(dto.accessToken());
+
+        Authentication authentication = jwtTokenProvider.getAuthentication(dto.accessToken());
+        if(redisTemplate.hasKey("AT:"+authentication.getName())){
+            redisTemplate.delete("AT:"+authentication.getName());
+        }
+        if(redisTemplate.hasKey("RT:"+authentication.getName())){
+            redisTemplate.delete("RT:"+authentication.getName());
+        }
+    }
 }
