@@ -7,6 +7,7 @@ import com.flab.s_market.domains.member.dto.request.JoinInfoDTO;
 import com.flab.s_market.domains.member.dto.request.LoginRequestDTO;
 import com.flab.s_market.domains.member.service.EmailService;
 import com.flab.s_market.domains.member.service.MemberService;
+import com.flab.s_market.domains.security.dto.request.JwtTokenLogoutRequestDTO;
 import com.flab.s_market.domains.security.dto.request.JwtTokenReissueRequestDTO;
 import com.flab.s_market.domains.security.dto.response.JwtTokenResponseDTO;
 import jakarta.validation.Valid;
@@ -63,6 +64,11 @@ public class MemberController {
     public ApiResponse<JwtTokenResponseDTO> reissue(@RequestBody @Valid JwtTokenReissueRequestDTO dto){
         JwtTokenResponseDTO responseData = memberService.reissueToken(dto);
         return ApiResponse.createSuccess(responseData);
+    }
+
+    @PostMapping("/logout")
+    public void logout(@RequestBody @Valid JwtTokenLogoutRequestDTO dto){
+        memberService.logout(dto);
     }
 
 }
