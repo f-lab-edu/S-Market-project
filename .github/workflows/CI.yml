@@ -22,12 +22,16 @@ jobs: # 여러 Step으로 구성되고, 각 step 들은 가상 환경의 인스�
           distribution: 'adopt'
           java-version: '17'
 
+      - name: create mysql docker container # 가상환경에 mysql 컨테이너 생성
+        run: |
+          sudo docker run -d -p 3306:3306 --env MYSQL_DATABASE=Smarket --env MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_PASSWORD }} mysql:8.0.23
+
       - name : Grant execute permission for gradlew # 권한 추가
         run: chmod +x ./gradlew
         shell: bash
 
       - name : Build with Gradle # gradle로 빌드
-        run: ./gradlew clean build
+        run: ./gradlew clean build --stacktrace
         shell: bash
 
       - name: Set up Docker Buildx # Dockerfile 빌드로 DockerImage 생성
