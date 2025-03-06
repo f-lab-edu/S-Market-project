@@ -41,7 +41,7 @@ jobs: # 여러 Step으로 구성되고, 각 step 들은 가상 환경의 인스�
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Build and push # DockerHub로 DockerImage Push
         uses: docker/build-push-action@v2
