@@ -46,7 +46,7 @@ jobs: # 여러 Step으로 구성되고, 각 step 들은 가상 환경의 인스�
           echo "Password : $DOCKER_PASSWORD"
 
       - name: Login to DockerHub # DockerHub 로그인
-        uses: docker/login-action@v1
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
