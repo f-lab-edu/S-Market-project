@@ -1,41 +1,58 @@
 package com.flab.s_market.common.exception;
 
-import com.flab.s_market.common.ApiResponse;
+import com.flab.s_market.common.entity.ApiResponse;
 import jakarta.validation.ConstraintViolationException;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Map;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    private Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    // error response를 정확히 어떻게 바꿔야할지 고민중
+    @Order(1)
     @ExceptionHandler(value={CustomException.class})
     public ResponseEntity<ApiResponse<?>> handleCustomException(CustomException e){
-        log.error("handleCustomException() in GlobalExceptionHandler throw CustomException : {}", e.getMessage());
+        Map<String, Object> parameters = e.getParameters();
+        if(e.getLogMethod() != null){
+            e.getLogMethod().accept("CustomException occured : parameters - " + parameters);
+        }
         return ResponseEntity
             .status(e.getErrorCode().getHttpStatus())
             .body(ApiResponse.createFail(e));
     }
-    @ExceptionHandler(value={MethodArgumentNotValidException.class})
-    public ResponseEntity<?> handleMethodArgumentException(MethodArgumentNotValidException e) {
-        BindingResult result = e.getBindingResult();
-        StringBuilder errMessage = new StringBuilder();
-
-        for (FieldError error : result.getFieldErrors()) {
-            errMessage.append(error.getDefaultMessage());
-        }
-        return new ResponseEntity<>(ApiResponse.createFailWithBindingResult(errMessage.toString()),
-            HttpStatus.BAD_REQUEST);
-    }
+    @Order(2)
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<?> handleConstraintViolationException(ConstraintViolationException e) {
-        String errorMessage = e.getConstraintViolations().iterator().next().getMessage();
-        return new ResponseEntity<>(ApiResponse.createFailWithBindingResult(errorMessage),
-            HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ApiResponse<?>> handleConstraintViolationException(ConstraintViolationException e) {
+        String errorMessage = ExceptionUtils.getFullStackTrace(e);
+        log.error("ConstraintViolationException occured : getFullStackTrace - " + errorMessage);
+
+        return new ResponseEntity<>(ApiResponse.createFailWithErrorMessage(errorMessage), HttpStatus.BAD_REQUEST);
+    }
+
+    @Order(3)
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ApiResponse<?>> handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
+        String errorMessage = ExceptionUtils.getFullStackTrace(e);
+        log.info("MissingServletRequestParameterException occured : getFullStackTrace - " + errorMessage);
+
+        return new ResponseEntity<>(ApiResponse.createFailWithErrorMessage(errorMessage), HttpStatus.BAD_REQUEST);
+    }
+
+    @Order(99)
+    @ExceptionHandler(value={Exception.class})
+    public ResponseEntity<ApiResponse<?>> handleException(Exception e){
+        String errorMessage = ExceptionUtils.getFullStackTrace(e);
+        log.error("Exception occured : getFullStackTrace - " + errorMessage);
+        // external error 어떻게 활용..??
+         // 9999
+        return new ResponseEntity<>(ApiResponse.createFailWithErrorMessage(errorMessage), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
