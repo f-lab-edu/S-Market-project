@@ -15,7 +15,7 @@ spring:
   jpa:
     open-in-view: true
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true
@@ -41,9 +41,3 @@ spring:
 server:
   address: ${SERVER_HOST}
   port: ${SERVER_PORT}
-
-aes:
-  secret-key : ${AES_SECRET_KEY}
-
-jwt:
-  secret : ${JWT_SECRET_KEY}
