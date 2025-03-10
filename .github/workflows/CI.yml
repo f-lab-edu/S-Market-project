@@ -58,6 +58,7 @@ jobs: # 여러 Step으로 구성되고, 각 step 들은 가상 환경의 인스�
           file: ./Dockerfile
           platforms: linux/amd64
           push: true
+          tags: ${{ secrets.DOCKERHUB_TAG }}
 
       - name: Get Current Time
         uses: 1466587594/get-current-time@v2
