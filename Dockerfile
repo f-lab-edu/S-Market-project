@@ -8,5 +8,5 @@ ENV JASYPT_ENCRYPTOR_PASSWORD=""
 #JASYPT 패스워드를 명시적으로 "" 선언함으로써, 변수가 주입되지 않으면 빈 문자열이 주입
 
 # 컨테이너가 실행될 때 기본적으로 실행될 명령을 정의 java -jar cicdtest.jar
-ENTRYPOINT ["java", "-Djasypt.encryptor.password=${JASYPT_ENCRYPTOR_PASSWORD}","-jar", "/app.jar"]
+ENTRYPOINT ["sh", "-c", "java -Djasypt.encryptor.password=$JASYPT_ENCRYPTOR_PASSWORD","-jar", "/app.jar"]
 
