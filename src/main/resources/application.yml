@@ -1,13 +1,10 @@
 spring:
-  # .env import
-  config:
-    import: optional:file:.env[.properties]
 
   datasource:
-    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?serverTimezone=Asia/Seoul
+    url: ENC(MBPB5/kMEvmdTIaWA5zMC3EBktd84imdo49CjN0OPT07nEdj8vPxFpsA/TxPn28XYdOPt11rcWuwXbmsXOHaW1Zxo4vG3JFH)
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username : ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    username : ENC(5HgYPv1SJGsfy5ARg5tA2w==)
+    password: ENC(Z/dZCvHw+MzOoW/55rhVGUCRGaAZN55o)
 
   application :
     name : s-market
@@ -24,9 +21,9 @@ spring:
 
   mail:
     host: smtp.naver.com
-    port : ${EMAIL_PORT}
-    username: ${EMAIL_USERNAME}
-    password: ${EMAIL_PW}
+    port : 465
+    username: ENC(tKQT3s7pfFzfHR8AmF/HTyiFeIPVzGsPf0suk4WSl0Y=)
+    password: ENC(DThMo2MyRt1krXc/qQR8YfSq84w8+PGE)
     protocol: smtps
     properties:
       mail.smtp.auth: true
@@ -35,15 +32,20 @@ spring:
 
   data:
     redis:
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT}
+      host: localhost
+      port: 6379
 
 server:
-  address: ${SERVER_HOST}
-  port: ${SERVER_PORT}
+  address: localhost
+  port: 8080
 
 aes:
-  secret-key : ${AES_SECRET_KEY}
+  secret-key : ENC(VbhFKKzW1SzNUNBg81/DjFo6IMM8VaXf8uOhIjIbx78=)
 
 jwt:
-  secret : ${JWT_SECRET_KEY}
+  secret : ENC(0cTn4l6+af3hANu7Vot7s6qRwtFisx8pdCzuFsEYnzHdZ1liOvr0ZOJUGI4GFD5WZYos0CTA4Gp248CUVpRkiA==)
+
+jasypt:
+  encryptor:
+    bean: jasyptStringEncryptor
+
